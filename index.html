@@ -62,7 +62,10 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .dow{font-size:.75rem;color:var(--muted);padding:4px 0}
 .day{position:relative;aspect-ratio:1;border:0;border-radius:12px;background:transparent;color:var(--ink);font:inherit;font-size:.95rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 .day.empty{visibility:hidden}
-.day.span{background:var(--river-soft)}
+.day.h1{background:color-mix(in srgb,var(--river) 10%,transparent)}
+.day.h2{background:color-mix(in srgb,var(--river) 18%,transparent)}
+.day.h3{background:color-mix(in srgb,var(--river) 27%,transparent)}
+.day.h4{background:color-mix(in srgb,var(--river) 36%,transparent)}
 .day.has{font-weight:600}
 .day .dots{display:flex;gap:2px;height:6px}
 .day .dots i{width:6px;height:6px;border-radius:50%;background:var(--blossom)}
@@ -71,7 +74,7 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .day.today{outline:2px solid var(--gold);outline-offset:-2px}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted);margin-top:12px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.legend .sw{width:14px;height:14px;border-radius:4px;background:var(--river-soft)}
+.legend .sw{width:44px;height:12px;border-radius:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--river) 10%,transparent),color-mix(in srgb,var(--river) 36%,transparent))}
 .legend .dt{width:7px;height:7px;border-radius:50%;background:var(--blossom)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 6px}
 .chips button{padding:6px 13px;font-size:.88rem}
@@ -128,7 +131,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
         </div>
       </div>
       <div class="grid" id="grid"></div>
-      <div class="legend"><span><i class="dt"></i>One dot per event that day</span></div>
+      <div class="legend"><span><i class="sw"></i>Darker = more going on</span><span><i class="dt"></i>One-night-only event</span></div>
     </div>
     <div class="chips" id="chips" role="group" aria-label="Filter by type"></div>
     <div class="status" id="status"></div>
@@ -144,6 +147,9 @@ const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-$
 const W="https://washington.org/things-to-do-this-november-in-washington-dc";
 function R(a,b,ex=[]){const out=[];let d=P(a);const e=P(b);while(d<=e){const k=iso(d);if(!ex.includes(k))out.push(k);d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);}return out;}
 const ITEMS=[
+ {id:"wellwed",t:"Wellness Wednesday",w:"National Portrait Gallery, 8th & G Sts NW",days:["2026-11-04"],time:"Noon–12:45pm",p:"Free",c:"culture",n:"Lunchtime meditation and sound bath among the portraits, adults 18+. No experience needed.",u:"https://my.si.edu/events/wellness-wednesday-209027855",s:"Smithsonian"},
+ {id:"loft",t:"Maggie Hughes DePalo (stand-up)",w:"DC Comedy Loft, Dupont Circle (above Bier Baron Tavern)",days:["2026-11-04"],time:"7:30pm (doors 6:30)",p:"$29.50 all-in + 2-item minimum",c:"culture",n:"Clean, deadpan Chicago comic in her DC Comedy Loft debut. Seating is first come, so arrive early to sit together. 18+.",u:"https://www.dccomedyloft.com/shows/382882",s:"DC Comedy Loft"},
+ {id:"hotbed",t:"Underground Comedy free show",w:"Hotbed, 2477 18th St NW, Adams Morgan",days:["2026-11-04"],time:"8pm",p:"Free",c:"culture",n:"Fast-paced showcase with rapid-fire sets from 10–15 comics. Easy to pair with dinner on 18th St.",u:"https://www.undergroundcomedydc.com/shows/389995",s:"Underground Comedy"},
  {id:"diwali",t:"Asia After Dark: Diwali Festival",w:"National Museum of Asian Art, National Mall",days:["2026-11-06"],time:"5–9pm",p:"Free (register)",c:"culture",n:"Diwali after hours: music, dance, talks, and a DJ dance party on the plaza from 7:30pm.",u:W,s:"washington.org"},
  {id:"choc",t:"DMV Chocolate & Coffee Festival",w:"Adventist Healthcare Fieldhouse, Boyds, MD",days:["2026-11-07","2026-11-08"],time:{"2026-11-07":"10am–5pm","2026-11-08":"10am–4pm"},p:"$20 at the door",c:"food",n:"150+ vendors, free samples and stage demos.",u:"https://edibledc.com/event/2026-maryland-dmv-chocolate-and-coffee-festival/",s:"Edible DC"},
  {id:"czech",t:"Czech Christmas Market",w:"Embassy of the Czech Republic, Van Ness",days:["2026-11-07"],time:"9am–6pm",p:"Free (registration required)",c:"holiday",n:"Mulled wine, Czech pastries, Moravian wines, glassware and garnet jewelry.",u:W,s:"washington.org"},
@@ -200,6 +206,7 @@ function persist(){try{localStorage.setItem("dmvDateSaved2",JSON.stringify([...s
 const val=(v,k)=> typeof v==="string"?v:(v[k]||(v.dow?v.dow[P(k).getDay()]:""));
 const priceStr=(it,k)=> typeof it.p==="string"?it.p:(k?val(it.p,k):"$13.99 Sun–Thu, $16.99 Fri–Sat");
 const timeStr=(it,k)=> typeof it.time==="string"?it.time:(k?val(it.time,k):(it.time.dow?"Mon–Thu "+it.time.dow[1]+"; Fri–Sat "+it.time.dow[5]+"; Sun "+it.time.dow[0]:Object.entries(it.time).map(([d,t])=>DOW[P(d).getDay()]+" "+t).join(", ")));
+const isSpecial=it=>it.days.length<=3;
 const isFree=it=>/^free/i.test(priceStr(it));
 const catOk=it=>cat==="all"||(cat==="free"?isFree(it):it.c===cat);
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -233,10 +240,11 @@ function render(){
   const first=new Date(y,m,1).getDay(),nd=new Date(y,m+1,0).getDate();
   let g=["S","M","T","W","T","F","S"].map(d=>`<div class="dow" aria-hidden="true">${d}</div>`).join("");
   for(let i=0;i<first;i++)g+=`<div class="day empty"></div>`;
+  const maxN=Math.max(1,...Array.from({length:nd},(_,i)=>{const k=iso(new Date(y,m,i+1));return inM.filter(it=>it.days.includes(k)).length;}));
   for(let d=1;d<=nd;d++){
-    const k=iso(new Date(y,m,d));const n=inM.filter(it=>it.days.includes(k)).length;
-    const cls=["day"];if(n)cls.push("has","span");if(+new Date(y,m,d)===+TODAY)cls.push("today");
-    g+=`<button class="${cls.join(" ")}" data-d="${d}" aria-pressed="${selDay===d}" aria-label="${MN[m]} ${d}: ${n} events">${d}<span class="dots">${"<i></i>".repeat(Math.min(n,3))}</span></button>`;
+    const k=iso(new Date(y,m,d));const on=inM.filter(it=>it.days.includes(k));const n=on.length;const sp=on.filter(isSpecial).length;
+    const cls=["day"];if(n)cls.push("has","h"+Math.ceil(4*n/maxN));if(+new Date(y,m,d)===+TODAY)cls.push("today");
+    g+=`<button class="${cls.join(" ")}" data-d="${d}" aria-pressed="${selDay===d}" aria-label="${MN[m]} ${d}: ${n} event${n===1?"":"s"}${sp?`, ${sp} one-night-only`:""}">${d}<span class="dots">${"<i></i>".repeat(Math.min(sp,3))}</span></button>`;
   }
   document.getElementById("grid").innerHTML=g;
   const st=document.getElementById("status");let list,ctx;
