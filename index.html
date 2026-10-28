@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Date Nights in the DMV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F6FA; --surface:#FFFFFF; --ink:#1B2340; --muted:#5E6584; --line:#DFE2EC;
+  --blossom:#D9497A; --blossom-soft:#FBE3EC; --river:#2C7A80; --river-soft:#DDF0EF;
+  --gold:#B7791F; --chip:#EEF0F6;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11152A; --surface:#1A1F38; --ink:#ECEEF7; --muted:#A3A8C3; --line:#2C3253;
+    --blossom:#F27AA3; --blossom-soft:#3A2440; --river:#6CC3C8; --river-soft:#1C3740;
+    --gold:#E7B35A; --chip:#242A47; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11152A; --surface:#1A1F38; --ink:#ECEEF7; --muted:#A3A8C3; --line:#2C3253;
+  --blossom:#F27AA3; --blossom-soft:#3A2440; --river:#6CC3C8; --river-soft:#1C3740;
+  --gold:#E7B35A; --chip:#242A47; color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Bricolage Grotesque",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:28px 18px 56px}
+header h1{font-size:clamp(2.6rem,11vw,4.4rem);line-height:.92;font-weight:800;letter-spacing:-.035em;margin:0 0 14px;font-variation-settings:"opsz" 96}
+header p{margin:0;color:var(--muted);max-width:34em}
+.views{display:flex;gap:8px;margin:22px 0 14px}
+.views button,.chips button{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:999px;padding:8px 16px;cursor:pointer;font-size:.95rem}
+.views button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.months{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}
+.months::-webkit-scrollbar{display:none}
+.months button{flex:0 0 auto;font:inherit;font-size:.9rem;border:0;background:transparent;color:var(--muted);padding:6px 10px;border-radius:10px;cursor:pointer}
+.months button[aria-current="true"]{background:var(--blossom-soft);color:var(--blossom);font-weight:600}
+.cal{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px 16px 14px;margin-top:6px}
+.banner{display:block;width:calc(100% + 32px);height:130px;margin:-18px -16px 14px;border-radius:22px 22px 0 0;overflow:hidden}
+.banner svg{width:100%;height:100%;display:block}
+.thumb{width:64px;height:64px;border-radius:16px;overflow:hidden;margin-bottom:8px}
+.thumb svg{width:100%;height:100%;display:block}
+@media (max-width:420px){.thumb{width:54px;height:54px;border-radius:14px}}
+.cal-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px}
+.cal-head h2{margin:0;font-size:clamp(2.2rem,9vw,3.4rem);line-height:.9;font-weight:800;letter-spacing:-.03em}
+.total{margin-top:8px;font-size:.9rem;font-weight:600;color:var(--blossom)}
+.cal-head h2 small{display:block;font-size:.95rem;font-weight:400;letter-spacing:0;color:var(--muted);margin-top:6px}
+.nav{display:flex;gap:6px}
+.nav button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:1.1rem;cursor:pointer}
+.nav button:disabled{opacity:.35;cursor:default}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.dow{font-size:.75rem;color:var(--muted);padding:4px 0}
+.day{position:relative;aspect-ratio:1;border:0;border-radius:12px;background:transparent;color:var(--ink);font:inherit;font-size:.95rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.day.empty{visibility:hidden}
+.day.span{background:var(--river-soft)}
+.day.has{font-weight:600}
+.day .dots{display:flex;gap:2px;height:6px}
+.day .dots i{width:6px;height:6px;border-radius:50%;background:var(--blossom)}
+.day[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.day[aria-pressed="true"] .dots i{background:var(--bg)}
+.day.today{outline:2px solid var(--gold);outline-offset:-2px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted);margin-top:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .sw{width:14px;height:14px;border-radius:4px;background:var(--river-soft)}
+.legend .dt{width:7px;height:7px;border-radius:50%;background:var(--blossom)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 6px}
+.chips button{padding:6px 13px;font-size:.88rem}
+.chips button[aria-pressed="true"]{background:var(--blossom);border-color:var(--blossom);color:#fff}
+.status{font-size:.9rem;color:var(--muted);margin:10px 0 4px;min-height:1.4em}
+.status button{font:inherit;color:var(--blossom);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+h3.sec{font-size:1.25rem;margin:28px 0 8px;letter-spacing:-.01em}
+.list{display:flex;flex-direction:column}
+.item{display:grid;grid-template-columns:76px 1fr auto;gap:12px;padding:16px 0;border-top:1px solid var(--line)}
+.when{font-weight:600;font-size:.9rem;line-height:1.25}
+.when small{display:block;font-weight:400;color:var(--muted)}
+.item h4{margin:0 0 2px;font-size:1.08rem;line-height:1.3;font-weight:600}
+.item .where{color:var(--muted);font-size:.9rem}
+.item .note{font-size:.93rem;margin:6px 0 8px}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.price{font-size:.82rem;padding:3px 9px;border-radius:999px;background:var(--chip)}
+.price.free{background:var(--river-soft);color:var(--river);font-weight:600}
+.tag{font-size:.78rem;color:var(--muted)}
+.est{font-size:.78rem;color:var(--gold)}
+.item a{font-size:.85rem;color:var(--river)}
+.save{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--muted);font-size:1.15rem;line-height:1}
+.save[aria-pressed="true"]{background:var(--blossom);border-color:var(--blossom);color:#fff}
+.empty-note{padding:18px 0;color:var(--muted);border-top:1px solid var(--line)}
+footer{margin-top:40px;font-size:.82rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (max-width:420px){.item{grid-template-columns:62px 1fr auto;gap:10px}}
+@media (prefers-reduced-motion:no-preference){.cal{transition:opacity .2s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Date nights in the DMV</h1>
+    <p>A year of things to do together around DC, Maryland and Virginia, from November 2026 to October 2027. Tap a day to see what’s on, and save the ones you want to try.</p>
+  </header>
+
+  <div class="views" role="group" aria-label="View">
+    <button id="vCal" aria-pressed="true">Calendar</button>
+    <button id="vSaved" aria-pressed="false">Our list (<span id="savedCount">0</span>)</button>
+  </div>
+
+  <section id="calView">
+    <nav class="months" id="months" aria-label="Months"></nav>
+    <div class="cal">
+      <div class="banner" id="banner" aria-hidden="true"></div>
+      <div class="cal-head">
+        <div><h2 id="mTitle"></h2><div class="total" id="total"></div></div>
+        <div class="nav">
+          <button id="prev" aria-label="Previous month">‹</button>
+          <button id="next" aria-label="Next month">›</button>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="legend">
+        <span><i class="dt"></i>Event starts or happens that day</span>
+        <span><i class="sw"></i>Running that day</span>
+      </div>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Filter by type"></div>
+    <div class="status" id="status"></div>
+    <div class="list" id="list"></div>
+    <h3 class="sec" id="monthWideHead">More ideas this month</h3>
+    <div class="list" id="monthWide"></div>
+    <h3 class="sec" id="anyHead">Good any month</h3>
+    <div class="list" id="anytime"></div>
+  </section>
+
+  <section id="savedView" hidden>
+    <div class="list" id="savedList"></div>
+  </section>
+
+  <footer>Dates and prices checked October 27, 2026. Anything marked “based on last year” uses the 2026 schedule as a guide, so confirm before you book. Prices marked with ~ are typical ranges rather than checked prices. Saved ideas stay on this device.</footer>
+</div>
+
+<script>
+const ITEMS = [
+  // November 2026
+  {id:"choc", t:"DMV Chocolate & Coffee Festival", w:"Adventist Healthcare Fieldhouse, Boyds, MD", s:"2026-11-07", e:"2026-11-08", p:"$20 at the door", c:"food", n:"150+ vendors, free samples and stage demos. VIP early entry Saturday at 9am.", u:"https://edibledc.com/event/2026-maryland-dmv-chocolate-and-coffee-festival/"},
+  {id:"cff", t:"Capital Food Fight", w:"The Anthem, DC Wharf", s:"2026-11-12", e:"2026-11-12", p:"From about $350", c:"food", n:"Live chef battle on stage plus unlimited bites and drinks from around 75 restaurants. 21+, 6–9pm.", u:"https://capitalfoodfight.org/"},
+  {id:"butler", t:"Butler’s Orchard Pumpkin Festival (last days)", w:"Germantown, MD", s:"2026-09-19", e:"2026-11-01", p:"$18–$47", c:"outdoors", n:"Hayride, corn maze and pick-your-own pumpkins at $0.79/lb. Reserve ahead.", u:"https://visitmontgomery.com/events/butlers-orchard-pumpkin-festival/"},
+  {id:"dupont", t:"DC Holiday Market at Dupont Circle", w:"1500 block of 19th St NW", s:"2026-11-12", e:"2026-12-23", p:"Free entry", c:"holiday", n:"35+ small businesses, mini donuts and hot roasted nuts.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"dtmarket", t:"DowntownDC Holiday Market", w:"F St NW between 7th and 9th", s:"2026-11-13", e:"2026-12-23", p:"Free entry", c:"holiday", n:"Local makers, warm drinks and seasonal bites outside the Portrait Gallery. Closed Thanksgiving.", u:"https://downtowndc.org/holiday-market/"},
+  {id:"frosted", t:"Frosted at Franklin Park", w:"Franklin Park, downtown DC", s:"2026-11-13", e:"2027-01-09", p:"Free", c:"holiday", n:"Icicle walkway and giant snowflakes, an easy photo stop before dinner.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"ccdc", t:"CityCenterDC tree lighting", w:"CityCenterDC, downtown", s:"2026-11-14", e:"2026-11-14", p:"Free", c:"holiday", n:"75-foot tree and the American Pops Orchestra; Palmer Alley stays lit all season.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"zoo", t:"ZooLights", w:"Smithsonian’s National Zoo", s:"2026-11-20", e:"2027-01-03", p:"About $10; parking $30", c:"holiday", n:"A million lights and animal lanterns on select nights, 5–9pm (Sundays to 8pm). Buy ahead.", u:"https://northernvirginiamag.com/things-to-do/2026/10/15/zoolights-tickets-are-on-sale-now/"},
+  {id:"enchant", t:"Enchant Christmas", w:"Nationals Park", s:"2026-11-20", e:"2026-12-27", p:"Ticketed", c:"holiday", n:"Giant Christmas light maze, an ice skating trail and a village market.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"snowglow", t:"Snowglow at Hi-Lawn", w:"The Dome above Union Market", s:"2026-11-20", e:"2027-01-03", p:"Ticketed", c:"food", n:"A 1970s Alpine hotel bar inside a 50-foot dome, with Alpine food and old-school cocktails.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"greenings", t:"Season’s Greenings", w:"U.S. Botanic Garden", s:"2026-11-26", e:"2027-01-03", p:"Free", c:"holiday", n:"Model trains, thousands of poinsettias and landmarks made from plants. No tickets needed.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"gol", t:"Garden of Lights", w:"Brookside Gardens, Wheaton (about 15 minutes away)", m:["2026-11","2026-12"], p:"About $14–$17", c:"holiday", est:true, n:"Half-mile walk through a million lights. Last season ran Nov 21 – Jan 4; tickets online only.", u:"https://montgomeryparks.org/2025-garden-of-lights-at-brookside-gardens/"},
+  {id:"skyline-n", t:"Last of the fall color on Skyline Drive", w:"Shenandoah National Park, VA", m:["2026-11"], p:"$30 per car", c:"outdoors", n:"Early November catches the tail of peak color. Pack a picnic for an overlook.", u:"https://www.nps.gov/shen/planyourvisit/automated-entry-stations.htm"},
+
+  {id:"zimmer", t:"Candlelight: The Best of Hans Zimmer", w:"National City Christian Church", s:"2026-10-27", e:"2027-02-27", p:"Ticketed", c:"culture", n:"Film scores by candlelight on select dates; check which nights.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"diwali", t:"Asia After Dark: Diwali Festival", w:"National Museum of Asian Art", s:"2026-11-06", e:"2026-11-06", p:"Free (register)", c:"culture", n:"Music, dance and a DJ dance party on the plaza, 5–9pm.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"porch", t:"Adams Morgan Fall PorchFest", w:"Adams Morgan, DC", s:"2026-11-07", e:"2026-11-07", p:"Free", c:"culture", n:"Nearly 100 bands playing on porches and a closed 18th Street.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"czech", t:"Czech Christmas Market", w:"Embassy of the Czech Republic", s:"2026-11-07", e:"2026-11-07", p:"Free (register)", c:"holiday", n:"Mulled wine, pastries and Bohemian crystal, 9am–6pm.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"dcbeer", t:"DC Beer Fest", w:"Nationals Park", s:"2026-11-07", e:"2026-11-07", p:"Ticketed", c:"food", n:"80+ craft breweries, food trucks and live music; noon or 5pm session.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"dcufan", t:"D.C. United vs NYCFC", w:"Audi Field", s:"2026-11-07", e:"2026-11-07", p:"Ticketed", c:"active", n:"Fan Appreciation Night, 4pm. Code VISITDC saves 10%.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"cbb", t:"UVA vs Arkansas basketball", w:"Capital One Arena", s:"2026-11-08", e:"2026-11-08", p:"Ticketed", c:"active", n:"College hoops showcase.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"milair", t:"Modern Military Aviation gallery opens", w:"National Air and Space Museum", s:"2026-11-11", e:"2026-11-11", p:"Free (timed pass)", c:"culture", n:"F-86 Sabre, a Huey and more. Veterans Day.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"nwsl", t:"NWSL Championship", w:"Audi Field", s:"2026-11-21", e:"2026-11-21", p:"Ticketed", c:"active", n:"The league’s title game, in prime time.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"doja", t:"Doja Cat", w:"Capital One Arena", s:"2026-11-21", e:"2026-11-21", p:"Ticketed", c:"culture", n:"7:30pm.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"tmbg", t:"They Might Be Giants", w:"9:30 Club", s:"2026-11-22", e:"2026-11-22", p:"Ticketed", c:"culture", n:"Eight-piece band with horns; earlier nights sold out.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"stevie", t:"Stevie Wonder: Songs in the Key of Life", w:"Capital One Arena", s:"2026-11-23", e:"2026-11-23", p:"Ticketed", c:"culture", n:"The full album live for its 50th anniversary, 8pm.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+  {id:"mvcandle", t:"Mount Vernon by Candlelight", w:"Mount Vernon, VA", s:"2026-11-27", e:"2026-11-28", p:"Ticketed", c:"holiday", n:"Candlelit estate tour and spiced cider.", u:"https://washington.org/things-to-do-this-november-in-washington-dc"},
+
+  // December 2026
+  {id:"heurich", t:"Christkindlmarkt", w:"Heurich House Museum, Dupont", s:"2026-12-03", e:"2026-12-06", p:"Ticketed", c:"holiday", n:"German-style market in the castle garden; tickets include the decorated mansion.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"menorah", t:"National Menorah lighting", w:"White House Ellipse", s:"2026-12-04", e:"2026-12-04", p:"Free", c:"holiday", n:"Latkes, doughnuts and music from the Navy Band.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"boats", t:"District Holiday Boat Parade", w:"The Wharf", s:"2026-12-05", e:"2026-12-05", p:"Free", c:"holiday", n:"Lit-up boats sail in from Alexandria, with fireworks at the end.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"zoo21", t:"ZooLights adults-only night", w:"Smithsonian’s National Zoo", s:"2026-12-16", e:"2026-12-16", p:"About $19", c:"holiday", n:"Same lights, no strollers. Date reported by event guides; confirm on the zoo’s site.", u:"https://thrillzing.com/seasonal-events/zoolights-2026-smithsonian-national-zoo/"},
+  {id:"mvillum", t:"Christmas Illuminations", w:"George Washington’s Mount Vernon, VA", s:"2026-12-19", e:"2026-12-20", p:"Ticketed", c:"holiday", n:"Fireworks over the Potomac and spiced cider.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"nattree", t:"National Christmas Tree", w:"President’s Park, White House Ellipse", m:["2026-12"], p:"Free", c:"holiday", n:"State and territory trees around it, plus nightly music.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"tudor", t:"Candlelight tour or wreath workshop", w:"Tudor Place, Georgetown", m:["2026-12"], p:"Varies", c:"culture", n:"Holiday tours, gingerbread and wreath-making in a historic house.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+  {id:"cocoa", t:"Holiday cocktail crawl", w:"Penn Social, Wunder Garten, Death Punch and more", m:["2026-12"], p:"Pay as you go", c:"food", n:"Mulled wine and hot buttered rum pop-ups around the city.", u:"https://washington.org/visit-dc/cant-miss-holiday-displays-events-washington-dc"},
+
+  // January – February 2027
+  {id:"rw-w", t:"Winter Restaurant Week", w:"Hundreds of restaurants across the DMV", m:["2027-01"], p:"$25–$35 brunch, $40–$65 dinner", c:"food", est:true, n:"Three-course prix fixe menus. Last year ran Jan 19–25 and was extended into February. Book early.", u:"https://www.congressheightsontherise.com/blog/jan-19-25-metropolitan-washington-winter-restaurant-week"},
+  {id:"vday", t:"Couples cooking class for Valentine’s", w:"Baltimore and DC", m:["2027-02"], p:"$85–$125 per person", c:"food", n:"Sushi, dumplings or a mystery-basket cook-off you compete in together.", u:"https://www.cozymeal.com/baltimore/team-building-activities/cooking-competition"},
+
+  // March – May 2027
+  {id:"cherry", t:"National Cherry Blossom Festival", w:"Tidal Basin and around DC", s:"2027-03-20", e:"2027-04-11", p:"Free to walk", c:"outdoors", n:"Parade, kite festival and blossom menus. Go at sunrise on a weekday to beat crowds.", u:"https://ma.to/venue/cherryblossfest"},
+  {id:"passport", t:"Passport DC embassy open houses", w:"Embassy Row and International Drive", m:["2027-05"], p:"Free", c:"culture", est:true, n:"Dozens of embassies open their doors with food and performances. In 2026 the big tour day was the first Saturday in May.", u:"https://eventsdc.com/sites/default/files/2026-05/PassportDC_2026_Brochure_MAP_v06_no%20crop%20marks.pdf"},
+
+  // Summer 2027
+  {id:"bethesda", t:"Bethesda Summer Concert Series", w:"Norfolk & St. Elmo Aves, Bethesda", m:["2027-06","2027-07","2027-08","2027-09"], p:"Free", c:"culture", est:true, n:"Friday live music, 6–8pm, with drinks from nearby restaurants.", u:"https://www.thelistareyouonit.com/buzz/spring-activations-2026"},
+  {id:"crab", t:"Crab soup cook-off", w:"Inner Harbor, Baltimore", m:["2027-06"], p:"Free to watch", c:"food", est:true, n:"Local chefs battle for the best Maryland crab soup; the public can taste and vote. Held June 26 in 2026.", u:"https://foxbaltimore.com/news/bmore-lifestyle/inner-harbor-heats-up-as-local-chefs-battle-for-marylands-best-crab-soup-title"},
+
+  // Fall 2027
+  {id:"renfest", t:"Maryland Renaissance Festival", w:"Revel Grove, Crownsville, MD", m:["2027-08","2027-09","2027-10"], p:"About $31 + tax and fees", c:"culture", est:true, n:"Jousting, 10 stages and turkey legs on weekends, late August to late October. Tickets online only and dates sell out.", u:"https://rennfest.com/faqs/"},
+  {id:"seafood", t:"Maryland Seafood Festival cook-off", w:"Annapolis area", m:["2027-09"], p:"Varies", c:"food", est:true, n:"Chefs compete for a World Food Championships ticket. Held September 13 in 2026.", u:"https://www.marylandrestaurants.com/world-food-championships"},
+  {id:"butler27", t:"Butler’s Orchard Pumpkin Festival", w:"Germantown, MD", m:["2027-09","2027-10"], p:"$18–$47", c:"outdoors", est:true, n:"Usually opens mid-September. Weekends sell out, so reserve.", u:"https://visitmontgomery.com/events/butlers-orchard-pumpkin-festival/"},
+  {id:"skyline", t:"Skyline Drive foliage drive", w:"Shenandoah National Park, VA", m:["2027-10"], p:"$30 per car", c:"outdoors", n:"Peak color is usually mid-to-late October. About 1.5–2 hours from Burtonsville.", u:"https://www.nps.gov/shen/planyourvisit/automated-entry-stations.htm"}
+];
+
+const I=(id,t,w,mo,p,c,n)=>({id,t,w,mo,p,c,n});
+const R=(a,b)=>{const r=[];let m=a;while(true){r.push(m);if(m===b)break;m=m%12+1;}return r;};
+const IDEAS=[
+// Evergreen
+I("smith","A Smithsonian museum, then dinner","National Mall, DC","all","Free","culture","Pick one museum, not five, then walk to Penn Quarter for dinner."),
+I("loc","Library of Congress Jefferson Building","Capitol Hill, DC","all","Free","culture","The main reading room overlook is one of the prettiest rooms in the city. Timed passes online."),
+I("brook","Brookside Gardens stroll","Wheaton, MD","all","Free","outdoors","Gardens and conservatory by day, about 15 minutes from Burtonsville."),
+I("arbor","U.S. National Arboretum","Northeast DC","all","Free","outdoors","The old Capitol columns in a meadow make a great picnic spot."),
+I("ubg","U.S. Botanic Garden conservatory","Near the Capitol, DC","all","Free","outdoors","Warm jungle room even in January."),
+I("monuments","Monuments by night","National Mall, DC","all","Free","outdoors","Lincoln Memorial at dusk, then walk to the Tidal Basin. Lit up and quiet after 9pm."),
+I("cook","Couples or team cooking class","Baltimore and DC","all","$85–$125 per person","food","Sushi, dumplings or a mystery-basket cook-off you compete in together."),
+I("homechopped","“Chopped” at home","Your kitchen","all","Cost of groceries","food","Each of you buys three mystery ingredients; 30 minutes to cook. Swap baskets."),
+I("silverspring","Ethiopian dinner in Silver Spring","Silver Spring, MD","all","Pay as you go","food","Share a big platter of injera; some of the best Ethiopian food in the country is 15 minutes away."),
+I("unionmkt","Union Market food hall","Northeast DC","all","Pay as you go","food","Graze stall to stall, then a drink at the rooftop or nearby bars."),
+I("brewery","Brewery hop","Hyattsville and Silver Spring, MD","all","Pay as you go","food","Two or three local taprooms, one designated driver or a rideshare."),
+I("winery","Maryland winery tasting","Black Ankle and other Frederick County wineries","all","~$20–$35 tasting","food","Book a tasting, bring snacks if allowed, sit by the fire in winter or on the lawn in summer."),
+I("ellicott","Ellicott City Main Street","Ellicott City, MD","all","Free to stroll","outdoors","Antique shops, dessert and a riverside walk, 25 minutes away."),
+I("annapolis","Annapolis evening","Downtown Annapolis","all","Free to stroll","outdoors","Walk the brick streets to the water at Ego Alley, then seafood dinner."),
+I("oldtown","Old Town Alexandria","King Street, Alexandria, VA","all","Free to stroll","outdoors","Shops and restaurants down to the waterfront."),
+I("frederick","Downtown Frederick","Frederick, MD","all","Free to stroll","outdoors","Carroll Creek walkway, antique shops and lots of restaurants."),
+I("aquarium","National Aquarium","Inner Harbor, Baltimore","all","~$50 per person","culture","Go on a weekday evening when it’s calmer; dinner in Fells Point after."),
+I("jazz","Jazz club dinner","Blues Alley, Georgetown","all","~$30–$50 cover","culture","Classic intimate supper club; book a table."),
+I("bigshow","Concert at The Anthem or 9:30 Club","Southwest and U Street, DC","all","Varies","culture","Check the calendar for an artist you both like."),
+I("candle","Candlelight concert","Venues around DC","all","~$35–$60 per person","culture","Classical or pop covers played in a room full of candles."),
+I("swing","Swing dancing at Glen Echo","Spanish Ballroom, Glen Echo Park, MD","all","~$15–$25 per person","active","Beginner lesson first, then dance in a 1930s ballroom."),
+I("climb","Climbing gym date","Movement or Earth Treks gyms, Columbia and Rockville","all","~$25–$35 day pass","active","Try bouldering; most gyms do intro sessions."),
+I("bowl","Duckpin bowling","Duckpin alleys around Maryland","all","~$5–$8 per game","active","Small balls, three rolls a frame. A very Maryland date."),
+I("escape","Escape room","Rooms around DC, MD and VA","all","~$35–$45 per person","active","60 minutes to solve it together. A good test of teamwork."),
+I("axe","Axe throwing","Venues around the DMV","all","~$30–$45 per person","active","Surprisingly easy to learn, and fun to be bad at."),
+I("games","Board game café","Board Room DC and others","all","~$10 per person","culture","Hundreds of games, drinks and snacks."),
+I("pottery","Pottery wheel class","Studios around the DMV","all","~$60–$90 per person","culture","Make a mug for each other."),
+I("paint","Paint and sip","Studios around the DMV","all","~$40–$55 per person","culture","Paint each other’s portrait for extra laughs."),
+I("trivia","Trivia night","Neighborhood bars","all","Free to play","food","Most bars run weekly trivia; pick a team name together."),
+I("karaoke","Private karaoke room","Annandale, Rockville and DC","all","~$30–$50 per hour","culture","Book a small room so it’s just the two of you."),
+I("spa","Korean spa day","Spa World, Centreville, VA","all","~$50–$70 per person","culture","Saunas, pools and Korean food on site. Plan the whole afternoon."),
+I("thrift","Vintage and thrift hunt","Takoma Park and Mount Rainier","all","Free to browse","culture","Set a $20 budget to find each other a gift."),
+// Winter
+I("rink","Outdoor ice skating","The Wharf, Sculpture Garden and Bethesda rinks","11,12,1,2","~$10–$15 plus skate rental","active","Go at night when the rinks are lit, then hot chocolate."),
+I("tubing","Snow tubing","Whitetail or Liberty Mountain, PA","12,1,2","~$30–$45 per person","active","About 1.5 hours north. Night sessions are cheaper and less crowded."),
+I("ski","Ski or snowboard lesson","Whitetail or Liberty Mountain, PA","12,1,2,3","~$80–$150 with rental","active","Book a beginner package if either of you is new."),
+I("hotpot","Hot pot dinner","Rockville and Annandale","11,12,1,2,3","Pay as you go","food","Pick a split broth and cook together."),
+I("winebar","Fireside wine bar night","Neighborhood wine bars","11,12,1,2,3","Pay as you go","food","Find a place with a fireplace and a cheese board."),
+I("lny","Lunar New Year parade","Chinatown, DC","2","Free","culture","Lion dances and firecrackers, usually on a Sunday in February."),
+I("autoshow","Washington Auto Show","Walter E. Washington Convention Center","1,2","~$20 per person","culture","Usually late January into February; sit in cars you’ll never buy."),
+I("caps","Capitals hockey game","Capital One Arena, DC","10,11,12,1,2,3,4","Varies","active","Upper-level seats are often the cheapest big-game date in town."),
+I("wizards","Wizards basketball game","Capital One Arena, DC","10,11,12,1,2,3,4","Varies","active","Weeknight games often have the cheapest seats."),
+I("snowwalk","Snow day walk in Rock Creek Park","Rock Creek Park, DC","12,1,2","Free","outdoors","After the next snowfall, before it melts."),
+I("valentine","Valentine’s tasting menu","Restaurants around the DMV","2","Varies","food","Book early; many places open reservations in January."),
+// Spring
+I("tulips","Tulip Library","Near the Tidal Basin, DC","4","Free","outdoors","Rows of tulips beside the Tidal Basin, usually best in early April."),
+I("azalea","Azaleas at the Arboretum","U.S. National Arboretum","4,5","Free","outdoors","Hillsides of color, usually late April."),
+I("bluebells","Bluebell walk","Riverbend Park, VA, or Merrimac Farm","4","Free","outdoors","Blue carpets of wildflowers in early-to-mid April."),
+I("strawberry","Strawberry picking","Butler’s Orchard and other farms","5,6","Pay by the pound","outdoors","Late May into June; go early before it’s hot."),
+I("nats","Nationals game","Nationals Park, DC","4,5,6,7,8,9","Varies","active","Grab cheap seats and walk the Navy Yard waterfront after."),
+I("os","Orioles game","Camden Yards, Baltimore","4,5,6,7,8,9","Varies","active","One of the best ballparks in the country."),
+I("spirit","Washington Spirit match","Audi Field, DC","3,4,5,6,7,8,9,10,11","Varies","active","Loud, fun crowd and easy to get tickets."),
+I("dcu","D.C. United match","Audi Field, DC","3,4,5,6,7,8,9,10","Varies","active","Pregame at the Navy Yard bars."),
+I("dumbarton","Dumbarton Oaks gardens","Georgetown, DC","3,4,5,6,7,8,9,10","~$11 per person","outdoors","Terraced gardens; the cherry and wisteria are best in spring."),
+I("billygoat","Billy Goat Trail","Great Falls, MD side","3,4,5,6,9,10,11","$20 per car park fee","active","A rock scramble with river views; bring water."),
+I("sugarloaf","Sugarloaf Mountain hike","Dickerson, MD","3,4,5,6,9,10,11","Free","active","Short climb to big views, then a winery nearby."),
+I("bike","Mount Vernon Trail bike ride","Alexandria to Mount Vernon","4,5,6,7,8,9,10","Bikeshare or rental","active","Flat riverside path; stop in Old Town for lunch."),
+I("market","Farmers market brunch date","Takoma Park, Dupont and others","4,5,6,7,8,9,10,11","Pay as you go","food","Buy breakfast ingredients and cook together after."),
+I("rooftop","Rooftop bar sunset","The Wharf, Navy Yard and downtown","4,5,6,7,8,9,10","Pay as you go","food","Time it for sunset."),
+I("flowermart","Flower Mart","Washington National Cathedral","5","Free","outdoors","Usually the first weekend of May; plants, food and the cathedral tower."),
+I("kayak","Kayak or paddleboard the Potomac","Key Bridge Boathouse, Georgetown","5,6,7,8,9,10","~$20–$30 per hour","active","Paddle under the bridges and past the Kennedy Center."),
+I("drum","Meridian Hill drum circle","Meridian Hill Park, DC","4,5,6,7,8,9,10","Free","culture","Sunday afternoons; bring a blanket."),
+// Summer
+I("wolftrap","Lawn seats at Wolf Trap","Vienna, VA","5,6,7,8,9","~$30–$60 per person","culture","Picnics allowed on the lawn; pack wine and a blanket."),
+I("merri","Concert at Merriweather Post Pavilion","Columbia, MD","5,6,7,8,9,10","Varies","culture","About 20 minutes away. Lawn seats are the cheap date option."),
+I("lotus","Lotus blooms at Kenilworth Aquatic Gardens","Northeast DC","6,7","Free","outdoors","Go at sunrise when the lotus flowers are open."),
+I("sail","Sunset sail","Annapolis harbor","5,6,7,8,9,10","~$50–$80 per person","outdoors","Two-hour schooner cruises with drinks for sale."),
+I("crabfeast","Maryland crab feast","Crab houses around the Bay","5,6,7,8,9","Market price","food","Paper on the table, Old Bay, mallets. Best in late summer."),
+I("berries","Blueberry or peach picking","Larriland Farm and others","6,7,8","Pay by the pound","outdoors","Make a pie together afterward."),
+I("beach","Beach day trip","Ocean City, MD, or Rehoboth, DE","6,7,8,9","Gas and parking","outdoors","About 2.5–3 hours; leave early to beat Bay Bridge traffic."),
+I("folklife","Smithsonian Folklife Festival","National Mall, DC","6,7","Free","culture","Usually late June into early July."),
+I("july4","Fourth of July fireworks","National Mall or a local park","7","Free","outdoors","Watch from the Mall, the Marine Corps Memorial or a rooftop."),
+I("rw-s","Summer Restaurant Week","Restaurants across the DMV","8","~$25–$65 per person","food","Usually in August with the same prix fixe tiers as winter."),
+I("taxi","Water taxi to Old Town","The Wharf to Alexandria","4,5,6,7,8,9,10","~$20–$30 round trip","outdoors","Dinner on one side, drinks on the other."),
+I("tubingriver","River tubing","Harpers Ferry, WV","6,7,8,9","~$40–$50 per person","active","Float the Shenandoah and explore the historic town after."),
+I("paddleboat","Paddle boats on the Tidal Basin","Tidal Basin, DC","3,4,5,6,7,8,9,10","Rental fee","outdoors","Jefferson Memorial views from the water."),
+// Fall
+I("apples","Apple picking","Larriland Farm and other orchards","9,10","Pay by the pound","outdoors","Make cider donuts or a pie after."),
+I("maze","Corn maze and hayride","Farms around Maryland","9,10","~$10–$20 per person","outdoors","Night mazes with a flashlight are extra fun."),
+I("haunt","Haunted trail or house","Farms and parks around the DMV","10","~$20–$40 per person","active","Hold hands, it’s allowed."),
+I("oktober","Oktoberfest","Wunder Garten and other beer gardens","9,10","Pay as you go","food","Pretzels, steins and polka."),
+I("harvest","Winery harvest festival","Maryland and Virginia wineries","9,10","~$30–$50 per person","food","Grape stomps, live music and tastings."),
+I("catoctin","Catoctin Mountain hike","Thurmont, MD","9,10,11","Free","active","Chimney Rock and Wolf Rock loop, about an hour away."),
+I("firepit","Fire pit and s’mores night","Beer gardens and wineries with fire pits","10,11,12,1,2,3","Pay as you go","food","Bring blankets."),
+I("hst","H Street Festival","H Street NE, DC","9","Free","culture","Huge street festival with food, music and art, usually in September."),
+I("amday","Adams Morgan Day","Adams Morgan, DC","9","Free","culture","Music stages and street food, usually in September."),
+];
+const EVER = IDEAS.filter(x=>x.mo==="all");
+const SEAS = IDEAS.filter(x=>x.mo!=="all");
+
+
+const SCENES = {
+ winter:`<svg viewBox="0 0 600 140" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="wsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B2550"/><stop offset="1" stop-color="#3B4A86"/></linearGradient></defs><rect width="600" height="140" fill="url(#wsky)"/><circle cx="510" cy="34" r="16" fill="#F4EBC9"/><circle cx="517" cy="29" r="14" fill="#2A3568"/>${Array.from({length:40},(_,i)=>`<circle cx="${(i*67)%600}" cy="${(i*37)%110}" r="${1+(i%3)*.7}" fill="#fff" opacity=".8"/>`).join("")}<path d="M290 120 L296 30 L302 120Z" fill="#E9ECF7"/><path d="M296 30 L293 38 L299 38Z" fill="#fff"/><path d="M0 118 Q150 100 300 116 T600 110 V140 H0Z" fill="#F4F6FB"/><path d="M0 126 Q160 114 320 128 T600 122 V140 H0Z" fill="#DCE2F2"/><path d="M40 70 Q180 100 320 72 T600 78" fill="none" stroke="#0E1433" stroke-width="1.5"/>${[60,110,160,210,260,350,400,450,500,550].map((x,i)=>`<circle cx="${x}" cy="${78+Math.sin(x/40)*8}" r="4" fill="${["#F27AA3","#F6C453","#6CC3C8","#F4F6FB"][i%4]}"/>`).join("")}</svg>`,
+ spring:`<svg viewBox="0 0 600 140" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="ssky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE3EC"/><stop offset="1" stop-color="#FFF4E6"/></linearGradient></defs><rect width="600" height="140" fill="url(#ssky)"/><path d="M240 96 H360 V88 H240Z" fill="#C9CFE0"/><path d="M250 88 Q300 40 350 88Z" fill="#E4E8F2"/><rect x="296" y="44" width="8" height="8" fill="#E4E8F2"/>${[255,270,285,300,315,330,345].map(x=>`<rect x="${x-2}" y="88" width="4" height="12" fill="#D2D8E8"/>`).join("")}<rect y="100" width="600" height="40" fill="#8EC9D0"/><path d="M0 108 H600 M40 118 H260 M340 124 H560" stroke="#B7E0E4" stroke-width="2"/><path d="M0 20 Q90 40 170 30 Q230 24 260 46" stroke="#5B3A3A" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M600 10 Q520 40 450 34 Q400 30 370 56" stroke="#5B3A3A" stroke-width="5" fill="none" stroke-linecap="round"/>${Array.from({length:46},(_,i)=>{const L=i<23;const t=(i%23)/22;const x=L?t*260:600-t*230;const y=(L?20+t*26:10+t*46)+((i*13)%14)-7;return `<circle cx="${x}" cy="${y}" r="${5+(i%4)}" fill="${["#F7A6C2","#F27AA3","#FFD1E0"][i%3]}"/>`}).join("")}${[90,190,420,520].map((x,i)=>`<circle cx="${x}" cy="${70+i*6}" r="3" fill="#F27AA3" opacity=".7"/>`).join("")}</svg>`,
+ summer:`<svg viewBox="0 0 600 140" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="usky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A6B"/><stop offset=".6" stop-color="#FFC979"/><stop offset="1" stop-color="#FFE3A8"/></linearGradient></defs><rect width="600" height="140" fill="url(#usky)"/><circle cx="300" cy="92" r="38" fill="#FFF1C9"/><rect y="92" width="600" height="48" fill="#2C7A80"/>${[100,104,110,118,126].map((y,i)=>`<rect x="${270-i*14}" y="${y}" width="${60+i*28}" height="2.5" rx="1" fill="#FFE3A8" opacity="${.8-i*.12}"/>`).join("")}<path d="M120 92 L120 50 L148 88Z" fill="#fff"/><path d="M118 54 L118 88 L98 88Z" fill="#F4F6FB"/><path d="M92 92 H156 L148 100 H100Z" fill="#1B2340"/><path d="M430 92 Q470 70 520 80 Q560 70 600 84 V92Z" fill="#1F5E63"/><path d="M0 92 Q40 76 90 86 Q130 78 160 92Z" fill="#1F5E63"/>${[[450,30],[480,40],[200,26]].map(([x,y])=>`<path d="M${x} ${y} q6 -6 12 0 q6 -6 12 0" fill="none" stroke="#7A4A3A" stroke-width="2"/>`).join("")}</svg>`,
+ fall:`<svg viewBox="0 0 600 140" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="fsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F9D7A8"/><stop offset="1" stop-color="#FCEBD2"/></linearGradient></defs><rect width="600" height="140" fill="url(#fsky)"/><path d="M0 90 Q120 50 240 80 T480 70 T600 76 V140 H0Z" fill="#C9844A" opacity=".55"/><path d="M0 110 Q150 80 300 104 T600 96 V140 H0Z" fill="#8C5A2B"/>${[[60,92],[120,86],[180,96],[420,84],[480,90],[540,82]].map(([x,y],i)=>`<rect x="${x-2}" y="${y}" width="4" height="22" fill="#5B3A22"/><circle cx="${x}" cy="${y-6}" r="${16+(i%3)*3}" fill="${["#D9534F","#E8892F","#F2B33D"][i%3]}"/><circle cx="${x+9}" cy="${y-12}" r="${10}" fill="${["#E8892F","#F2B33D","#D9534F"][i%3]}"/>`).join("")}${[[270,118,13],[300,122,9],[330,119,11]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.8}" fill="#F08A24"/><rect x="${x-1.5}" y="${y-r*.8-5}" width="3" height="6" fill="#4E6B2A"/>`).join("")}${Array.from({length:14},(_,i)=>`<ellipse cx="${(i*47+20)%600}" cy="${(i*29)%70+8}" rx="4" ry="2.4" transform="rotate(${i*40} ${(i*47+20)%600} ${(i*29)%70+8})" fill="${["#D9534F","#E8892F","#F2B33D"][i%3]}"/>`).join("")}</svg>`
+};
+const seasonOf = m => [11,0,1].includes(m)?"winter":[2,3,4].includes(m)?"spring":[5,6,7].includes(m)?"summer":"fall";
+const TH = {
+ food:["#FFD9C2","#FF9F7A",`<ellipse cx="32" cy="40" rx="20" ry="6" fill="#fff"/><path d="M12 38 Q32 58 52 38Z" fill="#fff"/><path d="M14 38 Q32 54 50 38Z" fill="#E86A4A"/><path d="M24 24 q-4 -5 0 -10 M32 26 q-4 -6 0 -12 M40 24 q-4 -5 0 -10" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>`],
+ holiday:["#2A3568","#1B2550",`<path d="M4 18 Q32 34 60 18" stroke="#E9ECF7" stroke-width="1.5" fill="none"/>${[10,20,32,44,54].map((x,i)=>`<rect x="${x-3}" y="${22+Math.sin(i)*3}" width="6" height="9" rx="3" fill="${["#F27AA3","#F6C453","#6CC3C8","#F6C453","#F27AA3"][i]}"/>`).join("")}<path d="M32 36 l4 10 h-8z M32 42 l6 12 h-12z" fill="#4FA36B"/><circle cx="32" cy="35" r="2.5" fill="#F6C453"/>`],
+ outdoors:["#CFEFE6","#8FD3C2",`<circle cx="46" cy="18" r="7" fill="#FFD36B"/><path d="M0 52 L20 26 L34 42 L44 32 L64 52Z" fill="#2C7A80"/><path d="M20 26 L25 32 L15 32Z" fill="#fff"/><rect y="50" width="64" height="14" fill="#4FA36B"/>`],
+ culture:["#E6DDFB","#B9A5F0",`<path d="M14 18 h22 v14 q0 12 -11 12 q-11 0 -11 -12z" fill="#fff"/><circle cx="20" cy="27" r="2" fill="#4B3A8C"/><circle cx="30" cy="27" r="2" fill="#4B3A8C"/><path d="M19 34 q6 5 12 0" stroke="#4B3A8C" stroke-width="2" fill="none"/><path d="M30 26 h22 v14 q0 12 -11 12 q-11 0 -11 -12z" fill="#4B3A8C"/><circle cx="36" cy="35" r="2" fill="#fff"/><circle cx="46" cy="35" r="2" fill="#fff"/><path d="M35 46 q6 -5 12 0" stroke="#fff" stroke-width="2" fill="none"/>`],
+ active:["#FFE7A3","#F6C453",`<circle cx="32" cy="32" r="17" fill="#fff"/><path d="M32 15 v34 M15 32 h34" stroke="#D9497A" stroke-width="2"/><path d="M20 20 q12 12 0 24 M44 20 q-12 12 0 24" stroke="#D9497A" stroke-width="2" fill="none"/>`]
+};
+function thumb(it){ const [a,b,ic]=TH[it.c]||TH.culture; const g="g"+it.id.replace(/[^a-z0-9]/gi,""); return `<div class="thumb" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="64" height="64" fill="url(#${g})"/>${ic}</svg></div>`; }
+
+const CATS = [["all","All"],["food","Food & drink"],["holiday","Lights & holiday"],["outdoors","Outdoors"],["culture","Shows & culture"],["active","Active"],["free","Free"]];
+const MONTHS = [];
+for (let i=0;i<12;i++){ const d=new Date(2026,10+i,1); MONTHS.push({y:d.getFullYear(), m:d.getMonth()}); }
+const MN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const MS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const TODAY = new Date(2026,9,27);
+
+let mi = 0, cat = "all", selDay = null;
+let saved = new Set();
+try { saved = new Set(JSON.parse(localStorage.getItem("dmvDateSaved")||"[]")); } catch(e){}
+function persist(){ try{ localStorage.setItem("dmvDateSaved", JSON.stringify([...saved])); }catch(e){} document.getElementById("savedCount").textContent = saved.size; }
+
+const P = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
+const key = (y,m) => `${y}-${String(m+1).padStart(2,"0")}`;
+const isFree = it => /^free/i.test(it.p);
+const catOk = it => cat==="all" || (cat==="free" ? isFree(it) : it.c===cat);
+function inMonth(it,y,m){ if(!it.s) return false; const a=P(it.s), b=P(it.e); return a<=new Date(y,m+1,0) && b>=new Date(y,m,1); }
+function onDay(it,date){ return it.s && P(it.s)<=date && P(it.e)>=date; }
+function whenLabel(it){
+  if(!it.s) return {a:"All month", b:""};
+  const a=P(it.s), b=P(it.e);
+  if(+a===+b) return {a:`${MS[a.getMonth()]} ${a.getDate()}`, b:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][a.getDay()]};
+  const ms = new Date(MONTHS[mi].y, MONTHS[mi].m, 1);
+  if (a < ms || +a===+TODAY) return {a:"Ongoing", b:`to ${MS[b.getMonth()]} ${b.getDate()}`};
+  return {a:`${MS[a.getMonth()]} ${a.getDate()}`, b:`to ${MS[b.getMonth()]} ${b.getDate()}`};
+}
+const esc = s => s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function card(it, showWhen=true){
+  const w = whenLabel(it);
+  const on = saved.has(it.id);
+  return `<article class="item">
+    <div class="when">${thumb(it)}${showWhen? `${w.a}<small>${w.b}</small>` : ""}</div>
+    <div>
+      <h4>${esc(it.t)}</h4>
+      <div class="where">${esc(it.w)}</div>
+      <p class="note">${esc(it.n)}</p>
+      <div class="meta">
+        <span class="price${isFree(it)?" free":""}">${esc(it.p)}</span>
+        <span class="tag">${CATS.find(c=>c[0]===it.c)[1]}</span>
+        ${it.est?'<span class="est">Based on last year</span>':""}
+        ${it.u?`<a href="${it.u}" target="_blank" rel="noopener">Details</a>`:""}
+      </div>
+    </div>
+    <button class="save" data-id="${it.id}" aria-pressed="${on}" aria-label="${on?"Remove from":"Save to"} our list">${on?"♥":"♡"}</button>
+  </article>`;
+}
+
+function renderMonths(){
+  document.getElementById("months").innerHTML = MONTHS.map((M,i)=>
+    `<button data-i="${i}" aria-current="${i===mi}">${MS[M.m]} ’${String(M.y).slice(2)}</button>`).join("");
+  const cur = document.querySelector('#months [aria-current="true"]');
+  if (cur && cur.scrollIntoView) cur.scrollIntoView({block:"nearest",inline:"center"});
+}
+
+function render(){
+  const {y,m} = MONTHS[mi];
+  document.getElementById("banner").innerHTML = SCENES[seasonOf(m)];
+  document.getElementById("mTitle").innerHTML = `${MN[m]}<small>${y}</small>`;
+  document.getElementById("prev").disabled = mi===0;
+  document.getElementById("next").disabled = mi===MONTHS.length-1;
+  renderMonths();
+
+  const dated = ITEMS.filter(it=>inMonth(it,y,m) && catOk(it));
+  const first = new Date(y,m,1).getDay(), days = new Date(y,m+1,0).getDate();
+  let g = ["S","M","T","W","T","F","S"].map(d=>`<div class="dow" aria-hidden="true">${d}</div>`).join("");
+  for(let i=0;i<first;i++) g += `<div class="day empty"></div>`;
+  for(let d=1; d<=days; d++){
+    const date = new Date(y,m,d);
+    const running = dated.filter(it=>onDay(it,date));
+    const starts = running.filter(it=>+P(it.s)===+date || (+P(it.s)<+new Date(y,m,1) && d===1 && false));
+    const cls = ["day"]; if(running.length) cls.push("span"); if(starts.length) cls.push("has");
+    if(+date===+TODAY) cls.push("today");
+    const dots = starts.slice(0,3).map(()=>"<i></i>").join("");
+    g += `<button class="${cls.join(" ")}" data-d="${d}" aria-pressed="${selDay===d}" aria-label="${MN[m]} ${d}: ${running.length} things on">${d}<span class="dots">${dots}</span></button>`;
+  }
+  document.getElementById("grid").innerHTML = g;
+
+  let list = dated;
+  const st = document.getElementById("status");
+  if (selDay){
+    const date = new Date(y,m,selDay);
+    list = dated.filter(it=>onDay(it,date));
+    st.innerHTML = `${list.length} thing${list.length===1?"":"s"} on ${MN[m]} ${selDay}. <button id="clearDay">Show the whole month</button>`;
+  } else {
+    st.textContent = dated.length ? `${dated.length} event${dated.length===1?"":"s"} with set dates` : "";
+  }
+  list.sort((a,b)=>P(a.s)-P(b.s));
+  document.getElementById("list").innerHTML = list.length ? list.map(it=>card(it)).join("") :
+    `<p class="empty-note">${selDay ? "Nothing scheduled that day. Try a highlighted day, or tap the day again to see the whole month." : "No dated events this month for this filter. The month-long ideas below still apply."}</p>`;
+
+  const dayOnly = !!selDay;
+  document.getElementById("monthWideHead").style.display = dayOnly?"none":"";
+  document.getElementById("monthWide").style.display = dayOnly?"none":"";
+  document.getElementById("anyHead").style.display = dayOnly?"none":"";
+  document.getElementById("anytime").style.display = dayOnly?"none":"";
+  const wide = [...ITEMS.filter(it=>it.m && it.m.includes(key(y,m))), ...SEAS.filter(it=>it.mo.split(",").map(Number).includes(m+1))].filter(catOk);
+  document.getElementById("monthWideHead").hidden = !wide.length;
+  document.getElementById("monthWideHead").textContent = `More ideas for ${MN[m]} (${wide.length})`;
+  const ev = EVER.filter(catOk);
+  document.getElementById("anyHead").textContent = `Good any month (${ev.length})`;
+  document.getElementById("total").textContent = `${dated.length + wide.length + ev.length} ideas in ${MN[m]}`;
+  document.getElementById("monthWide").innerHTML = wide.map(it=>card(it,false)).join("");
+  document.getElementById("anytime").innerHTML = ev.map(it=>card(it,false)).join("") || `<p class="empty-note">No anytime ideas for this filter.</p>`;
+}
+
+function renderSaved(){
+  const all = [...ITEMS, ...IDEAS].filter(it=>saved.has(it.id));
+  document.getElementById("savedList").innerHTML = all.length ? all.map(it=>card(it, !!it.s)).join("") :
+    `<p class="empty-note">Nothing saved yet. Tap the heart on any idea in the calendar to add it here.</p>`;
+}
+
+document.getElementById("chips").innerHTML = CATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===cat}">${l}</button>`).join("");
+document.getElementById("chips").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return; cat=b.dataset.c;
+  document.querySelectorAll("#chips button").forEach(x=>x.setAttribute("aria-pressed", x.dataset.c===cat));
+  render();
+});
+document.getElementById("months").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; mi=+b.dataset.i; selDay=null; render(); });
+document.getElementById("prev").onclick=()=>{ if(mi>0){mi--; selDay=null; render();} };
+document.getElementById("next").onclick=()=>{ if(mi<MONTHS.length-1){mi++; selDay=null; render();} };
+document.getElementById("grid").addEventListener("click",e=>{ const b=e.target.closest(".day"); if(!b||!b.dataset.d) return; const d=+b.dataset.d; selDay = selDay===d?null:d; render(); });
+document.getElementById("status").addEventListener("click",e=>{ if(e.target.id==="clearDay"){ selDay=null; render(); } });
+document.body.addEventListener("click",e=>{
+  const b=e.target.closest(".save"); if(!b) return;
+  const id=b.dataset.id; saved.has(id)?saved.delete(id):saved.add(id); persist();
+  if(!document.getElementById("savedView").hidden) renderSaved(); else render();
+});
+const vCal=document.getElementById("vCal"), vSaved=document.getElementById("vSaved");
+vCal.onclick=()=>{ vCal.setAttribute("aria-pressed",true); vSaved.setAttribute("aria-pressed",false); document.getElementById("calView").hidden=false; document.getElementById("savedView").hidden=true; render(); };
+vSaved.onclick=()=>{ vSaved.setAttribute("aria-pressed",true); vCal.setAttribute("aria-pressed",false); document.getElementById("calView").hidden=true; document.getElementById("savedView").hidden=false; renderSaved(); };
+
+persist(); render();
+</script>
+</body>
+</html>
