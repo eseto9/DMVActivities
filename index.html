@@ -96,6 +96,7 @@ h3.sec{font-size:1.25rem;margin:28px 0 8px;letter-spacing:-.01em}
 .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .price{font-size:.82rem;padding:3px 9px;border-radius:999px;background:var(--chip)}
 .price.free{background:var(--river-soft);color:var(--river);font-weight:600}
+.price.est{background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);border:1px dashed var(--gold)}
 .tag{font-size:.78rem;color:var(--muted)}
 .est{font-size:.78rem;color:var(--gold)}
 .item a{font-size:.85rem;color:var(--river)}
@@ -142,7 +143,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
     <p class="status">No date needed. These are open most days, with hours and prices checked.</p>
     <div class="list" id="anyList"></div>
   </section>
-  <footer>Checked October 28, 2026. Only events with a confirmed date, time and price are listed; events whose 2026 times or prices weren’t published yet were left off. Saved ideas stay on this device.</footer>
+  <footer>Checked October 28, 2026. Events with a confirmed date, time and price are listed as confirmed. A few big ones whose price isn’t published yet are included with an estimated price, marked in gold. Saved ideas stay on this device.</footer>
 </div>
 <script>
 const P = s => { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
@@ -151,6 +152,19 @@ const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-$
 const W="https://washington.org/things-to-do-this-november-in-washington-dc";
 function R(a,b,ex=[]){const out=[];let d=P(a);const e=P(b);while(d<=e){const k=iso(d);if(!ex.includes(k))out.push(k);d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);}return out;}
 const ITEMS=[
+ {id:"jingleblock",t:"Jingle Block Rock",w:"4th St SW at the Southwest Duck Pond",days:["2026-12-02"],time:"5–7pm",p:"Free",c:"holiday",n:"Neighborhood holiday block party with Step Afrika!, stilt walkers and donut decorating.",u:"https://washington.org/things-to-do-this-december-in-washington-dc",s:"washington.org"},
+ {id:"ice",t:"ICE! at Gaylord National",w:"Gaylord National Resort, National Harbor",days:R("2026-11-14","2027-01-03"),time:"Daily; timed entry in morning, afternoon or evening windows",p:"From $41 (ticket site)",c:"holiday",n:"Two million pounds of carved ice at 9°F, this year themed to How the Grinch Stole Christmas. Parkas provided.",u:"https://tickets.gaylordnational.com/eventperformances.asp?evt=121",s:"Gaylord National tickets"},
+ {id:"hiphopnut",t:"The Hip Hop Nutcracker",w:"The National Theatre, 1321 Pennsylvania Ave NW",days:["2026-11-17","2026-11-18","2026-11-19","2026-11-20","2026-11-21","2026-11-22"],time:"Evening shows; weekend matinees (check schedule)",p:"$40–$120",est:true,c:"culture",n:"Tchaikovsky remixed with a dozen hip-hop dancers and a DJ.",u:"https://washington.org/things-to-do-this-november-in-washington-dc",s:"washington.org"},
+ {id:"xmascarol",t:"A Christmas Carol at Ford’s Theatre",w:"Ford’s Theatre, 511 10th St NW",days:R("2026-11-19","2026-12-31",["2026-11-26","2026-12-24","2026-12-25"]),time:"7pm evenings, 2pm matinees (check schedule)",p:"$40–$130",est:true,c:"holiday",n:"DC’s holiday staple, with Craig Wallace as Scrooge in the theater where Lincoln was shot.",u:"https://fords.org/performance/a-christmas-carol-2026/",s:"Ford’s Theatre"},
+ {id:"nutcracker",t:"The Washington Ballet’s Nutcracker",w:"Warner Theatre, 513 13th St NW",days:R("2026-11-28","2026-12-27",["2026-12-24","2026-12-25"]),time:"Evening shows; weekend matinees (check schedule)",p:"$50–$180",est:true,c:"holiday",n:"The Georgetown-set Nutcracker with George Washington as the prince, in its 20th year.",u:"https://www.washingtonballet.org/events/",s:"Washington Ballet"},
+ {id:"stepafrika",t:"Step Afrika!’s Magical Musical Holiday Step Show",w:"Arena Stage, 1101 6th St SW",days:R("2026-12-04","2026-12-23"),time:"Evening shows; 1pm and 6pm some days (check schedule)",p:"$39–$90",est:true,c:"holiday",n:"High-energy stepping holiday show. The $39 end is from a published discount code.",u:"https://www.stepafrika.org/mmhss/",s:"Step Afrika!"},
+ {id:"gmcw",t:"Gay Men’s Chorus Holiday Show",w:"Lincoln Theatre, 1215 U St NW",days:["2026-12-05","2026-12-12","2026-12-13"],time:{"2026-12-05":"3 or 8pm","2026-12-12":"3 or 8pm","2026-12-13":"5pm"},p:"$30–$70",est:true,c:"holiday",n:"Big, campy choral holiday show with tap-dancing elves.",u:"https://www.gmcw.org/the-holiday-show/",s:"GMCW"},
+ {id:"scotwalk",t:"Alexandria Scottish Walk Parade",w:"Old Town Alexandria",days:["2026-12-05"],time:"10:30am–12:30pm",p:"Free",est:true,c:"holiday",n:"Pipe bands, Scottish clans and Scottie dogs through Old Town, the morning before the boat parade.",u:"https://www.alexandriava.gov/HolidayParades",s:"City of Alexandria"},
+ {id:"irishcarol",t:"An Irish Carol",w:"Keegan Theatre, 1742 Church St NW, Dupont",days:R("2026-12-05","2026-12-31",["2026-12-24","2026-12-25"]),time:"Evening shows; check schedule",p:"$45–$60",est:true,c:"holiday",n:"A Christmas Carol retold in a Dublin pub. Ages 16+.",u:"https://keegantheatre.com/",s:"Keegan Theatre"},
+ {id:"gtjingle",t:"Georgetown Jingle",w:"M Street and Washington Harbour, Georgetown",days:["2026-12-06"],time:"Daytime; hours not published",p:"Free",est:true,c:"holiday",n:"Live holiday music outdoors along M Street, ending with a St. Lucia procession to the Swedish embassy.",u:"https://www.georgetowndc.com/event/georgetown-jingle/",s:"Georgetown BID"},
+ {id:"jingleball",t:"Hot 99.5 Jingle Ball",w:"Capital One Arena, 601 F St NW",days:["2026-12-14"],time:"7:30pm (doors 6:30)",p:"$60–$250",est:true,c:"culture",n:"Pop radio’s holiday concert with a stack of big names on one bill.",u:"https://www.capitalonearena.com/events/detail/jingle-ball",s:"Capital One Arena"},
+ {id:"wfbnye",t:"New Year’s Eve with White Ford Bronco",w:"9:30 Club, 815 V St NW",days:["2026-12-31"],time:"Doors 9pm",p:"$35–$50",est:true,c:"culture",n:"DC’s all-’90s cover band plays into midnight with a champagne toast.",u:"https://impconcerts.com/event/white-ford-bronco/",s:"I.M.P."},
+ {id:"monsterjam",t:"Monster Jam",w:"Capital One Arena, 601 F St NW",days:["2027-01-30","2027-01-31"],time:{"2027-01-30":"1 or 7pm","2027-01-31":"1pm"},p:"$25–$75",est:true,c:"culture",n:"Loud, silly and fun; the Saturday 7pm show is the date-night one.",u:"https://www.capitalonearena.com/events",s:"Capital One Arena"},
  {id:"tonyrock",t:"Tony Rock (stand-up)",w:"DC Improv, 1140 Connecticut Ave NW",days:["2026-11-12","2026-11-13","2026-11-14","2026-11-15"],time:{"2026-11-12":"7:30pm","2026-11-13":"7:30 or 9:45pm","2026-11-14":"7 or 9:30pm","2026-11-15":"7pm"},p:"$45.50 GA all-in ($66.50 VIP)",c:"culture",n:"Four nights at the club. Two-item minimum in the showroom.",u:"https://www.dcimprov.com/shows/main-showroom/tony-rock",s:"DC Improv"},
  {id:"mazjobrani",t:"Maz Jobrani (stand-up)",w:"DC Improv, 1140 Connecticut Ave NW",days:["2026-12-03","2026-12-04","2026-12-05"],time:{"2026-12-03":"7pm","2026-12-04":"7 or 9:30pm","2026-12-05":"7 or 9:30pm"},p:"$50.50 GA all-in ($72 VIP)",c:"culture",n:"Headliner known from the Axis of Evil tour and Netflix specials.",u:"https://www.dcimprov.com/shows/main-showroom/maz-jobrani",s:"DC Improv"},
  {id:"samjay",t:"Sam Jay (stand-up)",w:"DC Improv, 1140 Connecticut Ave NW",days:["2026-12-18","2026-12-19"],time:{"2026-12-18":"7:30 or 9:45pm","2026-12-19":"7 or 9:30pm"},p:"$35 GA all-in ($47.50 reserved)",c:"culture",n:"Former SNL writer with an HBO special, in a small room.",u:"https://www.dcimprov.com/shows/main-showroom/sam-jay",s:"DC Improv"},
@@ -291,7 +305,7 @@ const val=(v,k)=> typeof v==="string"?v:(v[k]||(v.dow?v.dow[P(k).getDay()]:""));
 const priceStr=(it,k)=> typeof it.p==="string"?it.p:(k?val(it.p,k):(it.p.dow?(it.p.dow[1]===it.p.dow[5]?it.p.dow[1]:`Mon–Thu ${it.p.dow[1]}, Fri–Sat ${it.p.dow[5]}, Sun ${it.p.dow[0]}`):Object.values(it.p).join(" / ")));
 const timeStr=(it,k)=> typeof it.time==="string"?it.time:(k?val(it.time,k):(it.time.dow?"Mon–Thu "+it.time.dow[1]+"; Fri–Sat "+it.time.dow[5]+"; Sun "+it.time.dow[0]:Object.entries(it.time).map(([d,t])=>DOW[P(d).getDay()]+" "+t).join(", ")));
 const isSpecial=it=>it.days.length<=3;
-const isFree=it=>/^free/i.test(priceStr(it));
+const isFree=it=>!it.est&&/^free/i.test(priceStr(it));
 const catOk=it=>cat==="all"||(cat==="free"?isFree(it):it.c===cat);
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function daysLabel(it,y,m){
@@ -307,9 +321,9 @@ function card(it,ctx){
     <h4>${esc(it.t)}</h4><div class="where">${esc(it.w)}</div>
     <div class="chipline"><span class="time">${esc(when)}</span></div>
     <div class="chipline"><span class="tag">🕒 ${esc(timeStr(it,k))}</span></div>
-    <div class="chipline"><span class="price${isFree(it)?" free":""}">${esc(priceStr(it,k))}</span></div>
+    <div class="chipline"><span class="price${it.est?" est":isFree(it)?" free":""}">${it.est?"Est. ":""}${esc(priceStr(it,k))}</span>${it.est?`<span class="est">Price not published; our guess</span>`:""}</div>
     <p class="note">${esc(it.n)}</p>
-    <div class="src">Confirmed via <a href="${it.u}" target="_blank" rel="noopener">${esc(it.s)}</a></div>
+    <div class="src">${it.est?"Date and time via":"Confirmed via"} <a href="${it.u}" target="_blank" rel="noopener">${esc(it.s)}</a></div>
   </div><button class="save" data-id="${it.id}" aria-pressed="${on}" aria-label="${on?"Unheart":"Heart"} ${esc(it.t)}">${on?"♥":"♡"}</button></article>`;
 }
 function render(){
