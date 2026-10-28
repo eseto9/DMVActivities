@@ -62,10 +62,13 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .dow{font-size:.75rem;color:var(--muted);padding:4px 0}
 .day{position:relative;aspect-ratio:1;border:0;border-radius:12px;background:transparent;color:var(--ink);font:inherit;font-size:.95rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 .day.empty{visibility:hidden}
-.day.h1{background:color-mix(in srgb,var(--river) 10%,transparent)}
-.day.h2{background:color-mix(in srgb,var(--river) 18%,transparent)}
-.day.h3{background:color-mix(in srgb,var(--river) 27%,transparent)}
-.day.h4{background:color-mix(in srgb,var(--river) 36%,transparent)}
+.day.h1{background:color-mix(in srgb,var(--river) 14%,transparent)}
+.day.h2{background:color-mix(in srgb,var(--river) 34%,transparent)}
+.day.h3{background:color-mix(in srgb,var(--river) 62%,transparent);color:var(--bg)}
+.day.h4{background:var(--river);color:var(--bg)}
+.day.saved{box-shadow:inset 0 0 0 3px var(--blossom)}
+.day.past{opacity:.35}
+.item.pinned{background:var(--blossom-soft);border-radius:14px;padding-left:10px;padding-right:10px}
 .day.has{font-weight:600}
 .day .dots{display:flex;gap:2px;height:6px}
 .day .dots i{width:6px;height:6px;border-radius:50%;background:var(--blossom)}
@@ -74,7 +77,8 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .day.today{outline:2px solid var(--gold);outline-offset:-2px}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted);margin-top:12px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.legend .sw{width:44px;height:12px;border-radius:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--river) 10%,transparent),color-mix(in srgb,var(--river) 36%,transparent))}
+.legend .sw{width:44px;height:12px;border-radius:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--river) 14%,transparent),var(--river))}
+.legend .ol{width:14px;height:14px;border-radius:4px;box-shadow:inset 0 0 0 3px var(--blossom)}
 .legend .dt{width:7px;height:7px;border-radius:50%;background:var(--blossom)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 6px}
 .chips button{padding:6px 13px;font-size:.88rem}
@@ -113,12 +117,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 <div class="wrap">
   <header>
     <h1>Date nights in the DMV</h1>
-    <p>Every event here has a confirmed date, time and price, checked against the organizer or an official listing. Tap a day to see exactly what’s on, and save the ones you want.</p>
+    <p>Every event here has a confirmed date, time and price, checked against the organizer or an official listing. Tap a day to see exactly what’s on, and heart the ones you want. Hearted events jump to the top and their days get a pink outline.</p>
   </header>
-  <div class="views" role="group" aria-label="View">
-    <button id="vCal" aria-pressed="true">Calendar</button>
-    <button id="vSaved" aria-pressed="false">Our list (<span id="savedCount">0</span>)</button>
-  </div>
   <section id="calView">
     <nav class="months" id="months" aria-label="Months"></nav>
     <div class="cal">
@@ -131,13 +131,17 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
         </div>
       </div>
       <div class="grid" id="grid"></div>
-      <div class="legend"><span><i class="sw"></i>Darker = more going on</span><span><i class="dt"></i>One-night-only event</span></div>
+      <div class="legend"><span><i class="sw"></i>Darker = more going on</span><span><i class="dt"></i>One-night-only event</span><span><i class="ol"></i>Has something you hearted</span></div>
     </div>
     <div class="chips" id="chips" role="group" aria-label="Filter by type"></div>
     <div class="status" id="status"></div>
     <div class="list" id="list"></div>
   </section>
-  <section id="savedView" hidden><div class="list" id="savedList"></div></section>
+  <section id="anyView">
+    <h3 class="sec">Any day</h3>
+    <p class="status">No date needed. These are open most days, with hours and prices checked.</p>
+    <div class="list" id="anyList"></div>
+  </section>
   <footer>Checked October 28, 2026. Only events with a confirmed date, time and price are listed; events whose 2026 times or prices weren’t published yet were left off. Saved ideas stay on this device.</footer>
 </div>
 <script>
@@ -147,10 +151,14 @@ const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-$
 const W="https://washington.org/things-to-do-this-november-in-washington-dc";
 function R(a,b,ex=[]){const out=[];let d=P(a);const e=P(b);while(d<=e){const k=iso(d);if(!ex.includes(k))out.push(k);d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);}return out;}
 const ITEMS=[
+ {id:"hotbed",t:"Underground Comedy free shows",w:"Hotbed, 2477 18th St NW, Adams Morgan",days:R("2026-10-28","2026-11-30",["2026-11-26"]),time:{dow:["8pm","8pm (new-material night)","8pm (new-material night)","8pm","8pm","11:30pm","11:30pm"]},p:"Free",c:"culture",n:"Rapid-fire sets from 10–15 local comics. First come, first served, so arrive early; upstairs bar opens at 7. 21+.",u:"https://www.hotbedcomedydc.com/events",s:"Hotbed"},
+ {id:"godfrey",t:"Godfrey (stand-up)",w:"DC Improv, 1140 Connecticut Ave NW",days:["2026-10-29","2026-10-30","2026-10-31","2026-11-01"],time:{"2026-10-29":"7:30 or 9:45pm","2026-10-30":"7:30 or 9:45pm","2026-10-31":"6, 8:15 or 10:30pm","2026-11-01":"6pm"},p:"$44 GA all-in ($92.50 VIP)",c:"culture",n:"Veteran headliner, four nights only. Saturday has three shows.",u:"https://www.dcimprov.com/shows/main-showroom/godfrey",s:"DC Improv"},
+ {id:"soul",t:"Soul Strolls: Becoming America",w:"Congressional Cemetery, Capitol Hill",days:["2026-10-30","2026-10-31"],time:{"2026-10-30":"6–10:30pm","2026-10-31":"5–11pm"},p:"$40",c:"culture",n:"Evening stroll through the historic cemetery on Halloween weekend. A spooky, walkable date on the Hill.",u:"https://congressionalcemetery.org/soul-strolls/",s:"Congressional Cemetery"},
+ {id:"villa",t:"Melissa Villaseñor (stand-up)",w:"DC Improv, 1140 Connecticut Ave NW",days:["2026-11-05","2026-11-06","2026-11-07"],time:{"2026-11-05":"7:30pm","2026-11-06":"7:30 or 9:45pm","2026-11-07":"7 or 9:30pm"},p:"$37–$42 GA all-in ($49.50–$54.50 reserved)",c:"culture",n:"SNL alum famous for spot-on impressions.",u:"https://www.dcimprov.com/shows/main-showroom/melissa-villasenor",s:"DC Improv"},
+ {id:"carmichael",t:"Jerrod Carmichael (stand-up)",w:"DC Improv, 1140 Connecticut Ave NW",days:["2026-11-10","2026-11-11"],time:"7:30pm",p:"$49 GA all-in ($65 VIP)",c:"culture",n:"Emmy-winning comic in a small club. Phone-free show, so phones get locked away.",u:"https://www.dcimprov.com/shows/main-showroom/jerrod-carmichael",s:"DC Improv"},
  {id:"frida",t:"Frida…A Self Portrait",w:"Shakespeare Theatre Company, Klein Theatre, 450 7th St NW",days:["2026-11-04"],time:"7:30pm (75 min, no intermission)",p:"$97–$154",c:"culture",n:"Vanessa Severo’s one-woman show as Frida Kahlo, a critics’ favorite. Closes Nov 8, so this is one of the last weeknights.",u:"https://www.shakespearetheatre.org/index.php/events/frida-a-self-portrait-26-27",s:"Shakespeare Theatre Co."},
  {id:"wizhawks",t:"Wizards vs. Hawks",w:"Capital One Arena, 601 F St NW",days:["2026-11-04"],time:"7pm tip-off",p:"Resale from $11 on TickPick (price moves)",c:"culture",n:"Cheap, easy weeknight NBA game in Chinatown. Grab dinner nearby first.",u:"https://www.tickpick.com/buy-washington-wizards-vs-atlanta-hawks-tickets-capital-one-arena-11-4-26-7pm/8206011/",s:"Capital One Arena + TickPick"},
  {id:"loft",t:"Maggie Hughes DePalo (stand-up)",w:"DC Comedy Loft, Dupont Circle (above Bier Baron Tavern)",days:["2026-11-04"],time:"7:30pm (doors 6:30)",p:"$29.50 all-in + 2-item minimum",c:"culture",n:"Clean, deadpan Chicago comic in her DC Comedy Loft debut. Seating is first come, so arrive early to sit together. 18+.",u:"https://www.dccomedyloft.com/shows/382882",s:"DC Comedy Loft"},
- {id:"hotbed",t:"Underground Comedy free show",w:"Hotbed, 2477 18th St NW, Adams Morgan",days:["2026-11-04"],time:"8pm",p:"Free",c:"culture",n:"Fast-paced showcase with rapid-fire sets from 10–15 comics. Easy to pair with dinner on 18th St.",u:"https://www.undergroundcomedydc.com/shows/389995",s:"Underground Comedy"},
  {id:"diwali",t:"Asia After Dark: Diwali Festival",w:"National Museum of Asian Art, National Mall",days:["2026-11-06"],time:"5–9pm",p:"Free (register)",c:"culture",n:"Diwali after hours: music, dance, talks, and a DJ dance party on the plaza from 7:30pm.",u:W,s:"washington.org"},
  {id:"choc",t:"DMV Chocolate & Coffee Festival",w:"Adventist Healthcare Fieldhouse, Boyds, MD",days:["2026-11-07","2026-11-08"],time:{"2026-11-07":"10am–5pm","2026-11-08":"10am–4pm"},p:"$20 at the door",c:"food",n:"150+ vendors, free samples and stage demos.",u:"https://edibledc.com/event/2026-maryland-dmv-chocolate-and-coffee-festival/",s:"Edible DC"},
  {id:"czech",t:"Czech Christmas Market",w:"Embassy of the Czech Republic, Van Ness",days:["2026-11-07"],time:"9am–6pm",p:"Free (registration required)",c:"holiday",n:"Mulled wine, Czech pastries, Moravian wines, glassware and garnet jewelry.",u:W,s:"washington.org"},
@@ -178,6 +186,16 @@ const ITEMS=[
  {id:"illum",t:"Christmas Illuminations",w:"George Washington’s Mount Vernon, VA",days:["2026-12-19","2026-12-20"],time:"5:30–8:30pm (fireworks ~8pm)",p:"$58 adults",c:"holiday",n:"Fireworks over the Potomac, a winter market and the lantern-lit estate.",u:"https://www.fxva.com/blog/post/visiting-mount-vernon-for-the-holidays/",s:"Visit Fairfax"},
  {id:"improvnye",t:"New Year’s Eve Comedy Showcase",w:"DC Improv, 1140 Connecticut Ave NW",days:["2026-12-31"],time:"7:30pm, or 10:15pm countdown show",p:"$40–$80 GA (all-in)",c:"culture",n:"Top local comics. The 10:15 show adds champagne, charcuterie and party favors; every ticket comes with a free pass to a 2027 show.",u:"https://dcimprov.com/shows/main-showroom/nye-main",s:"DC Improv"}
 ];
+const ANYTIME=[
+ {id:"a-mall",t:"Monuments and memorials at night",w:"National Mall, from the Lincoln Memorial to the Tidal Basin",time:"Open 24 hours (rangers on duty 9:30am–10pm)",p:"Free",c:"culture",n:"Walk past the lit-up memorials with no tickets or reservations, and plenty of room to talk.",u:"https://www.nps.gov/nama/planyourvisit/hours.htm",s:"National Park Service"},
+ {id:"a-unionmkt",t:"Union Market food hall",w:"1309 5th St NE, NoMa",time:"Mon–Sat 8am–9pm, Sun 8am–8pm",p:"Free to walk in; food and drinks à la carte",c:"food",n:"Graze a few stalls and share plates. Snowglow and the Hi-Lawn rooftop are upstairs.",u:"https://unionmarketdc.com",s:"Union Market"},
+ {id:"a-pinstripes",t:"Bowling and bocce at Pinstripes",w:"1064 Wisconsin Ave NW, Georgetown",time:"Mon 3–9pm, Tue 12–9pm, Wed–Thu 12–10pm, Fri 12–11pm, Sat 10am–11pm, Sun 10am–9pm",p:"$10–$18 per person per hour; food and drinks extra",c:"food",n:"Bowling or bocce with dinner and drinks in the same place, so one stop covers the night.",u:"https://www.pinstripes.com/georgetown/bowling-bocce",s:"Pinstripes"},
+ {id:"a-escape",t:"Escape the Room DC",w:"Penn Quarter and Farragut North",time:"Mon–Fri noon–11pm, Sat–Sun 11am–11pm",p:"From $37 per person",c:"culture",n:"Work a puzzle room together, with unlimited hints. Both locations are next to Metro.",u:"https://escapetheroom.com/dc/",s:"Escape the Room DC"},
+ {id:"a-spy",t:"International Spy Museum",w:"700 L’Enfant Plaza SW",time:"Mon–Fri 10am–6pm, Sat 9am–7pm, Sun 9am–6pm",p:"From $33.95 per person (timed tickets)",c:"culture",n:"Interactive exhibits you can play as a team. Plan on two to three hours.",u:"https://www.spymuseum.org/visit/",s:"Spy Museum"},
+ {id:"a-phillips",t:"The Phillips Collection",w:"1600 21st St NW, Dupont Circle",time:"Tue–Sat 10am–5pm, Sun 11am–5pm; Third Thursdays 5–8pm",p:"$20 adults; free on Third Thursdays 5–8pm",c:"culture",n:"Small, quiet modern-art museum in a historic house. The Third Thursday evening is free.",u:"https://www.phillipscollection.org/visit",s:"Phillips Collection"},
+ {id:"a-nga",t:"National Gallery of Art",w:"6th St & Constitution Ave NW, National Mall",time:"Daily 10am–5pm; closed Dec 25 and Jan 1",p:"Free",c:"culture",n:"A huge free collection to wander slowly. Pair it with the Sculpture Garden rink once it opens.",u:"https://www.nga.gov/visit",s:"National Gallery of Art"},
+ {id:"a-hillwood",t:"Hillwood Estate, Museum and Garden",w:"4155 Linnean Ave NW, Forest Hills",time:"Tue–Sun 10am–5pm; closed Mondays and holidays",p:"$20 suggested donation",c:"culture",n:"Marjorie Merriweather Post’s mansion and gardens, calm and unhurried. Good for a daytime date.",u:"https://hillwoodmuseum.org/visit/hours-tickets",s:"Hillwood"}
+];
 
 const SCENES = {
  winter:`<svg viewBox="0 0 600 140" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="wsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B2550"/><stop offset="1" stop-color="#3B4A86"/></linearGradient></defs><rect width="600" height="140" fill="url(#wsky)"/><circle cx="510" cy="34" r="16" fill="#F4EBC9"/><circle cx="517" cy="29" r="14" fill="#2A3568"/>${Array.from({length:40},(_,i)=>`<circle cx="${(i*67)%600}" cy="${(i*37)%110}" r="${1+(i%3)*.7}" fill="#fff" opacity=".8"/>`).join("")}<path d="M290 120 L296 30 L302 120Z" fill="#E9ECF7"/><path d="M296 30 L293 38 L299 38Z" fill="#fff"/><path d="M0 118 Q150 100 300 116 T600 110 V140 H0Z" fill="#F4F6FB"/><path d="M0 126 Q160 114 320 128 T600 122 V140 H0Z" fill="#DCE2F2"/><path d="M40 70 Q180 100 320 72 T600 78" fill="none" stroke="#0E1433" stroke-width="1.5"/>${[60,110,160,210,260,350,400,450,500,550].map((x,i)=>`<circle cx="${x}" cy="${78+Math.sin(x/40)*8}" r="4" fill="${["#F27AA3","#F6C453","#6CC3C8","#F4F6FB"][i%4]}"/>`).join("")}</svg>`,
@@ -196,14 +214,14 @@ const TH = {
 function thumb(it){ const [a,b,ic]=TH[it.c]||TH.culture; const g="g"+it.id.replace(/[^a-z0-9]/gi,""); return `<div class="thumb" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="64" height="64" fill="url(#${g})"/>${ic}</svg></div>`; }
 
 const CATS=[["all","All"],["food","Food & drink"],["holiday","Holiday & lights"],["culture","Culture"],["free","Free"]];
-const MONTHS=[{y:2026,m:10},{y:2026,m:11},{y:2027,m:0}];
+const MONTHS=[{y:2026,m:9},{y:2026,m:10},{y:2026,m:11},{y:2027,m:0}];
 const MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const MS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const TODAY=new Date(2026,9,28);
 let mi=0,cat="all",selDay=null,saved=new Set();
 try{saved=new Set(JSON.parse(localStorage.getItem("dmvDateSaved2")||"[]"));}catch(e){}
-function persist(){try{localStorage.setItem("dmvDateSaved2",JSON.stringify([...saved]));}catch(e){}document.getElementById("savedCount").textContent=saved.size;}
+function persist(){try{localStorage.setItem("dmvDateSaved2",JSON.stringify([...saved]));}catch(e){}}
 const val=(v,k)=> typeof v==="string"?v:(v[k]||(v.dow?v.dow[P(k).getDay()]:""));
 const priceStr=(it,k)=> typeof it.p==="string"?it.p:(k?val(it.p,k):"$13.99 Sun–Thu, $16.99 Fri–Sat");
 const timeStr=(it,k)=> typeof it.time==="string"?it.time:(k?val(it.time,k):(it.time.dow?"Mon–Thu "+it.time.dow[1]+"; Fri–Sat "+it.time.dow[5]+"; Sun "+it.time.dow[0]:Object.entries(it.time).map(([d,t])=>DOW[P(d).getDay()]+" "+t).join(", ")));
@@ -220,14 +238,14 @@ function card(it,ctx){
   const on=saved.has(it.id);
   const k=ctx.day||null;
   const when=k?`${DOW[P(k).getDay()]} ${MS[P(k).getMonth()]} ${P(k).getDate()}`:(ctx.y!==undefined?daysLabel(it,ctx.y,ctx.m):`${MS[P(it.days[0]).getMonth()]} ${P(it.days[0]).getDate()} – ${MS[P(it.days[it.days.length-1]).getMonth()]} ${P(it.days[it.days.length-1]).getDate()}`);
-  return `<article class="item"><div class="when">${thumb(it)}</div><div>
+  return `<article class="item${on?" pinned":""}"><div class="when">${thumb(it)}</div><div>
     <h4>${esc(it.t)}</h4><div class="where">${esc(it.w)}</div>
     <div class="chipline"><span class="time">${esc(when)}</span></div>
     <div class="chipline"><span class="tag">🕒 ${esc(timeStr(it,k))}</span></div>
     <div class="chipline"><span class="price${isFree(it)?" free":""}">${esc(priceStr(it,k))}</span></div>
     <p class="note">${esc(it.n)}</p>
     <div class="src">Confirmed via <a href="${it.u}" target="_blank" rel="noopener">${esc(it.s)}</a></div>
-  </div><button class="save" data-id="${it.id}" aria-pressed="${on}" aria-label="${on?"Remove from":"Save to"} our list">${on?"♥":"♡"}</button></article>`;
+  </div><button class="save" data-id="${it.id}" aria-pressed="${on}" aria-label="${on?"Unheart":"Heart"} ${esc(it.t)}">${on?"♥":"♡"}</button></article>`;
 }
 function render(){
   const {y,m}=MONTHS[mi];
@@ -244,18 +262,30 @@ function render(){
   const maxN=Math.max(1,...Array.from({length:nd},(_,i)=>{const k=iso(new Date(y,m,i+1));return inM.filter(it=>it.days.includes(k)).length;}));
   for(let d=1;d<=nd;d++){
     const k=iso(new Date(y,m,d));const on=inM.filter(it=>it.days.includes(k));const n=on.length;const sp=on.filter(isSpecial).length;
-    const cls=["day"];if(n)cls.push("has","h"+Math.ceil(4*n/maxN));if(+new Date(y,m,d)===+TODAY)cls.push("today");
-    g+=`<button class="${cls.join(" ")}" data-d="${d}" aria-pressed="${selDay===d}" aria-label="${MN[m]} ${d}: ${n} event${n===1?"":"s"}${sp?`, ${sp} one-night-only`:""}">${d}<span class="dots">${"<i></i>".repeat(Math.min(sp,3))}</span></button>`;
+    const cls=["day"];if(n)cls.push("has","h"+Math.ceil(4*n/maxN));if(+new Date(y,m,d)===+TODAY)cls.push("today");if(new Date(y,m,d)<TODAY)cls.push("past");if(ITEMS.some(it=>saved.has(it.id)&&it.days.includes(k)))cls.push("saved");
+    g+=`<button class="${cls.join(" ")}" data-d="${d}" aria-pressed="${selDay===d}" aria-label="${MN[m]} ${d}: ${n} event${n===1?"":"s"}${sp?`, ${sp} one-night-only`:""}${cls.includes("saved")?", includes something you hearted":""}">${d}<span class="dots">${"<i></i>".repeat(Math.min(sp,3))}</span></button>`;
   }
   document.getElementById("grid").innerHTML=g;
   const st=document.getElementById("status");let list,ctx;
   if(selDay){const k=iso(new Date(y,m,selDay));list=inM.filter(it=>it.days.includes(k));ctx={day:k};
     st.innerHTML=`${list.length} event${list.length===1?"":"s"} on ${DOW[new Date(y,m,selDay).getDay()]}, ${MN[m]} ${selDay}. <button id="clearDay">Show the whole month</button>`;}
   else{list=inM;ctx={y,m};st.textContent="";}
-  list.sort((a,b)=>P(a.days.find(k=>P(k).getMonth()===m&&P(k).getFullYear()===y))-P(b.days.find(k=>P(k).getMonth()===m&&P(k).getFullYear()===y)));
+  list.sort((a,b)=>(saved.has(b.id)-saved.has(a.id))||P(a.days.find(k=>P(k).getMonth()===m&&P(k).getFullYear()===y))-P(b.days.find(k=>P(k).getMonth()===m&&P(k).getFullYear()===y)));
   document.getElementById("list").innerHTML=list.length?list.map(it=>card(it,ctx)).join(""):`<div class="emptymonth">${selDay?"Nothing confirmed for this day yet.":"Nothing confirmed for this month and filter yet."}</div>`;
+  renderAny();
 }
-function renderSaved(){const all=ITEMS.filter(it=>saved.has(it.id));document.getElementById("savedList").innerHTML=all.length?all.map(it=>card(it,{})).join(""):`<p class="empty-note">Nothing saved yet. Tap the heart on any event to add it here.</p>`;}
+function anyCard(it){
+  const on=saved.has(it.id);
+  return `<article class="item${on?" pinned":""}"><div class="when">${thumb(it)}</div><div>
+    <h4>${esc(it.t)}</h4><div class="where">${esc(it.w)}</div>
+    <div class="chipline"><span class="time">Any day</span></div>
+    <div class="chipline"><span class="tag">🕒 ${esc(it.time)}</span></div>
+    <div class="chipline"><span class="price${/^free/i.test(it.p)?" free":""}">${esc(it.p)}</span></div>
+    <p class="note">${esc(it.n)}</p>
+    <div class="src">Confirmed via <a href="${it.u}" target="_blank" rel="noopener">${esc(it.s)}</a></div>
+  </div><button class="save" data-id="${it.id}" aria-pressed="${on}" aria-label="${on?"Unheart":"Heart"} ${esc(it.t)}">${on?"♥":"♡"}</button></article>`;
+}
+function renderAny(){const l=ANYTIME.filter(it=>cat==="all"||(cat==="free"?/^free/i.test(it.p):it.c===cat)).sort((a,b)=>saved.has(b.id)-saved.has(a.id));document.getElementById("anyList").innerHTML=l.length?l.map(anyCard).join(""):`<div class="emptymonth">Nothing in this category.</div>`;}
 document.getElementById("chips").innerHTML=CATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===cat}">${l}</button>`).join("");
 document.getElementById("chips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.c;document.querySelectorAll("#chips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===cat));render();});
 document.getElementById("months").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;mi=+b.dataset.i;selDay=null;render();});
@@ -263,10 +293,7 @@ document.getElementById("prev").onclick=()=>{if(mi>0){mi--;selDay=null;render();
 document.getElementById("next").onclick=()=>{if(mi<MONTHS.length-1){mi++;selDay=null;render();}};
 document.getElementById("grid").addEventListener("click",e=>{const b=e.target.closest(".day");if(!b||!b.dataset.d)return;const d=+b.dataset.d;selDay=selDay===d?null:d;render();});
 document.getElementById("status").addEventListener("click",e=>{if(e.target.id==="clearDay"){selDay=null;render();}});
-document.body.addEventListener("click",e=>{const b=e.target.closest(".save");if(!b)return;const id=b.dataset.id;saved.has(id)?saved.delete(id):saved.add(id);persist();if(!document.getElementById("savedView").hidden)renderSaved();else render();});
-const vCal=document.getElementById("vCal"),vSaved=document.getElementById("vSaved");
-vCal.onclick=()=>{vCal.setAttribute("aria-pressed",true);vSaved.setAttribute("aria-pressed",false);document.getElementById("calView").hidden=false;document.getElementById("savedView").hidden=true;render();};
-vSaved.onclick=()=>{vSaved.setAttribute("aria-pressed",true);vCal.setAttribute("aria-pressed",false);document.getElementById("calView").hidden=true;document.getElementById("savedView").hidden=false;renderSaved();};
+document.body.addEventListener("click",e=>{const b=e.target.closest(".save");if(!b)return;const id=b.dataset.id;saved.has(id)?saved.delete(id):saved.add(id);persist();render();});
 persist();render();
 </script>
 </body>
