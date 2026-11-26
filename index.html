@@ -70,14 +70,12 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .dow{font-size:.75rem;color:var(--muted);padding:4px 0}
 .day{position:relative;aspect-ratio:1;border:0;border-radius:12px;background:transparent;color:var(--ink);font:inherit;font-size:.95rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 .day.empty{visibility:hidden}
-.day.saved{box-shadow:inset 0 0 0 3px var(--blossom)}
+.day.saved::after{content:"♥";position:absolute;top:4px;right:7px;color:var(--blossom);font-size:1.05rem;line-height:1}
+.day.saved[aria-pressed="true"]::after{color:#fff}
 .day.past{opacity:.35}
 .day.has{font-weight:600}
 .day[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .day.today{outline:2px solid var(--gold);outline-offset:-2px}
-.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted);margin-top:12px}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.legend .ol{width:14px;height:14px;border-radius:4px;box-shadow:inset 0 0 0 3px var(--blossom)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 6px}
 .chips button{padding:6px 13px;font-size:.88rem}
 .chips.areas{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 0 12px;padding-bottom:2px}
@@ -186,7 +184,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 <div class="wrap">
   <header>
     <h1>Date nights in the DMV</h1>
-    <p>Every event here has a confirmed date, time and price, checked against the organizer or an official listing. Swipe the week or tap a date to see what’s on, open the full month to jump ahead, and tap any card for the details. Any day lists places that don’t need a date; Movies shows what’s playing. Each day shows its forecast. Heart the ones you want: they jump to the top and their days get a pink outline.</p>
+    <p>Every event here has a confirmed date, time and price, checked against the organizer or an official listing. Swipe the week or tap a date to see what’s on, open the full month to jump ahead, and tap any card for the details. Any day lists places that don’t need a date; Movies shows what’s playing. Each day shows its forecast. Heart the ones you want: they jump to the top and their days get a little heart.</p>
   </header>
   <div class="views" role="group" aria-label="View">
     <button id="vCal" data-v="calView" aria-pressed="true">Calendar</button>
@@ -206,7 +204,6 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
         </div>
       </div>
       <div class="strip" id="strip" aria-label="This week"></div>
-      <div class="legend"><span><i class="ol"></i>Has something you hearted</span><span>Forecast for DC from Open-Meteo, next 16 days</span></div>
     </div>
     <section class="bigwrap" id="bigWrap"><h3 class="sec">Coming up</h3><div class="bigs" id="bigs"></div></section>
     <div class="chips" id="chips" role="group" aria-label="Filter by type"></div>
@@ -224,7 +221,6 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
     </div>
     <nav class="months" id="months" aria-label="Months"></nav>
     <div class="grid" id="grid"></div>
-    <div class="legend"><span><i class="ol"></i>Has something you hearted</span><span>Weather shows for the next 16 days</span></div>
   </dialog>
   <section id="anyView" hidden>
     <h3 class="sec">Any day</h3>
