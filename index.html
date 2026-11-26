@@ -124,7 +124,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 .caldlg .cal-head h2{font-size:clamp(1.8rem,7vw,2.6rem)}
 .caldlg .months{padding:0 0 8px}
 /* ---- tile grid ---- */
-.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:10px}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:10px;grid-auto-flow:row dense}
 .tile{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
 .tile.pinned{border-color:var(--blossom);box-shadow:0 0 0 2px var(--blossom-soft)}
 .topen{cursor:pointer;display:flex;flex-direction:column;flex:1;color:inherit}
@@ -143,14 +143,15 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 .tdetail .addr{font-size:.85rem;color:var(--muted);margin-bottom:4px}
 .tdetail .hours{font-size:.85rem;font-weight:600;margin-top:4px}
 .tdetail .note{margin:4px 0 6px;white-space:pre-line}
-.tile.open{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
-.tile.open .topen{flex-direction:row;flex:1 1 100%}
-.tile.open .thumb{width:38%;max-width:260px;flex:0 0 auto;align-self:stretch;aspect-ratio:auto;min-height:150px}
-.tile.open.movie .thumb{width:28%;max-width:180px}
-.tile.open .tbody{flex:1;padding:12px 14px}
+.tile.open{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,230px) 1fr;grid-template-rows:auto 1fr;align-items:start}
+.tile.open .topen{display:contents}
+.tile.open .thumb{grid-column:1;grid-row:1/3;width:100%;height:auto;aspect-ratio:4/5;align-self:start}
+.tile.open.movie .thumb{aspect-ratio:2/3}
+.tile.open .tbody{grid-column:2;grid-row:1;padding:12px 52px 4px 14px}
 .tile.open .t4{-webkit-line-clamp:unset;font-size:1.1rem}
 .tile.open .where{white-space:normal}
-.tile.open .tdetail{flex:1 1 100%;padding:0 14px 14px}
+.tile.open .tdetail{grid-column:2;grid-row:2;padding:2px 14px 14px}
+@media (max-width:560px){.tile.open{grid-template-columns:1fr;grid-template-rows:auto}.tile.open .thumb,.tile.open.movie .thumb{grid-column:1;grid-row:auto;aspect-ratio:16/8}.tile.open.movie .thumb img{object-position:center 20%}.tile.open .tbody{grid-column:1;grid-row:auto;padding:10px 46px 2px 12px}.tile.open .tdetail{grid-column:1;grid-row:auto;padding:2px 12px 12px;font-size:.88rem}}
 .mstat{font-size:.74rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--river-soft);color:var(--river)}
 .mstat.soon{background:var(--blossom-soft);color:var(--blossom)}
 .tile.movie .tbody{gap:4px}
@@ -219,7 +220,7 @@ const W="https://washington.org/things-to-do-this-november-in-washington-dc";
 const DD=(a,b,d)=>Object.fromEntries(R(a,b).map(k=>[k,d[P(k).getDay()]]));
 function R(a,b,ex=[]){const out=[];let d=P(a);const e=P(b);while(d<=e){const k=iso(d);if(!ex.includes(k))out.push(k);d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1);}return out;}
 const ITEMS=[
- {id:"cheapmovietue",t:"Cheap movie Tuesday",w:"LOOK, Landmark, AMC, Regal, Alamo and indie theaters near Rockville, Bethesda and Tysons",loc:"MD, VA & DC",days:R("2026-11-03","2027-03-30").filter(k=>P(k).getDay()===2),time:"All day",tfull:"All day Tuesday (AMC also Wednesday)",p:"$5–$9 a ticket",c:"culture",n:"Near you (Tuesdays unless noted)\n• LOOK Dine-In Tysons & Reston: Discount Tuesday, about $6 (price not posted online)\n• Landmark Bethesda Row: $7 with free Landmark Loyalty\n• Warehouse Cinemas Rockville: $7\n• AMC Montgomery 16 (Bethesda), Tysons Corner 16, Rio (Gaithersburg): half off Tue AND Wed with free AMC Stubs\n• Regal Majestic Silver Spring: $7.99 or less with free Crown Club\n• Paragon Founders Row, Falls Church: $5, no account\nCheapest elsewhere\n• University Mall, Fairfax: $6, no account\n• Alamo: $7 One Loudoun & Woodbridge, $9 Crystal City\n• Cinemark Fairfax Corner: up to half off\nNo Tuesday deal: iPic Pike & Rose, AFI Silver, CinéBistro Tysons, Cinépolis Gaithersburg.\nHolidays: Cinemark skips Dec 22 & 29; others may skip holiday Tuesdays. Premium formats cost extra.",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/4DX_seats_in_cinema_%28motion_and_environmental_effects_synced_with_the_on-screen_action%29_bench_rows_in_a_movie_theater_hall_Kinostoler_kinosal_Kilden_kino_T%C3%B8nsberg%2C_Norway_2023_IMG_7852.jpg/1280px-thumbnail.jpg",u:"https://www.amctheatres.com/discount-tuesdays",s:"theater and chain offer pages"},
+ {id:"cheapmovietue",t:"Cheap movie Tuesday",w:"Theaters near Rockville, Bethesda and Tysons",loc:"MD, VA & DC",days:R("2026-11-03","2027-03-30").filter(k=>P(k).getDay()===2),time:"All day",p:"$5–$9 a ticket",c:"culture",n:"Near you\n• Paragon, Falls Church: $5\n• LOOK, Tysons & Reston: about $6\n• Landmark, Bethesda Row: $7*\n• Warehouse, Rockville: $7\n• AMC, Bethesda & Tysons: half off, Tue and Wed*\nFarther out: University Mall Fairfax $6, Alamo $7–9, Regal about $8*\n* free membership needed. Holiday weeks may skip the deal.",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/4DX_seats_in_cinema_%28motion_and_environmental_effects_synced_with_the_on-screen_action%29_bench_rows_in_a_movie_theater_hall_Kinostoler_kinosal_Kilden_kino_T%C3%B8nsberg%2C_Norway_2023_IMG_7852.jpg/1280px-thumbnail.jpg",u:"https://www.amctheatres.com/discount-tuesdays",s:"theater and chain offer pages"},
  {id:"cl-candle-alx",t:"Holiday candle-making with Olga Kardonova",w:"Shop Made in VA, 1121 King St, Old Town Alexandria",days:["2026-11-28"],time:"3–5pm",p:"$71.41",c:"class",n:"Pour and scent your own candles, then King Street for dinner.",img:"https://cdn.happeningnext.com/events8/banners/da507d50-901f-11f1-a33a-f7150662a5aa-rimg-w555-h740-dc588808-gmir.jpg",u:"https://www.eventbrite.com/e/a-very-merry-candle-making-workshop-with-olga-kardonova-tickets-2003965553917",s:"Eventbrite"},
  {id:"cl-candle-dupont",t:"Candle Making: Holiday Edition",w:"WE MAKE DC, 1140 Connecticut Ave NW, Dupont",days:["2026-11-28"],time:"3–5pm",p:"$34.95",c:"class",n:"Cheaper two-hour candle class in Dupont.",img:"https://cdn.happeningnext.com/events3/banners/258cf210-a95e-11f1-a4a1-eb59356bc08b-rimg-w740-h740-dcf8f8f8-gmir.jpg",u:"https://www.eventbrite.com/e/candle-making-holiday-edition-tickets-2004653822547",s:"Eventbrite"},
  {id:"cl-candle-gtown",t:"Holiday candle-making with Olga Kardonova (Georgetown)",w:"Shop Made in DC, 1304 Wisconsin Ave NW, Georgetown",days:["2026-11-29", "2026-12-19"],time:{"2026-11-29": "11am–1pm", "2026-12-19": "3–5pm (Dupont location)"},p:"$74.21",c:"class",n:"Same candle class; the Dec 19 session is at WE MAKE DC in Dupont.",img:"https://cdn.happeningnext.com/events8/banners/da507d50-901f-11f1-a33a-f7150662a5aa-rimg-w555-h740-dc588808-gmir.jpg",u:"https://www.eventbrite.com/e/a-very-merry-candle-making-workshop-with-olga-kardonova-tickets-2003965553917",s:"Eventbrite"},
