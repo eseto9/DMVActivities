@@ -50,11 +50,9 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .banner svg{width:100%;height:100%;display:block}
 .thumb{width:64px;height:64px;border-radius:16px;overflow:hidden;margin-bottom:8px;position:relative;background:var(--chip)}
 .thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.mposter{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:10px;display:block;background:var(--chip);margin:-4px 0 4px}
 .thumb svg{width:100%;height:100%;display:block}
-@media (max-width:420px){.thumb{width:54px;height:54px;border-radius:14px}}
 .cal-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px}
-.cal-head h2{margin:0;font-size:clamp(2.2rem,9vw,3.4rem);line-height:.9;font-weight:800;letter-spacing:-.03em}
+.cal-head h2{margin:0;font-size:clamp(1.9rem,7.5vw,3rem);line-height:.9;font-weight:800;letter-spacing:-.03em;white-space:nowrap}
 .total{margin-top:8px;font-size:.9rem;font-weight:600;color:var(--blossom)}
 .cal-head h2 small{display:block;font-size:.95rem;font-weight:400;letter-spacing:0;color:var(--muted);margin-top:6px}
 .nav{display:flex;gap:6px}
@@ -70,7 +68,6 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .day.h4{background:var(--river);color:var(--bg)}
 .day.saved{box-shadow:inset 0 0 0 3px var(--blossom)}
 .day.past{opacity:.35}
-.item.pinned{background:var(--blossom-soft);border-radius:14px;padding-left:10px;padding-right:10px}
 .day.has{font-weight:600}
 .day .dots{display:flex;gap:2px;height:6px}
 .day .dots i{width:6px;height:6px;border-radius:50%;background:var(--blossom)}
@@ -88,47 +85,75 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .status{font-size:.9rem;color:var(--muted);margin:10px 0 4px;min-height:1.4em}
 .status button{font:inherit;color:var(--blossom);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 h3.sec{font-size:1.25rem;margin:28px 0 8px;letter-spacing:-.01em}
-.list{display:flex;flex-direction:column}
-.item{display:grid;grid-template-columns:76px 1fr auto;gap:12px;padding:16px 0;border-top:1px solid var(--line)}
-.when{font-weight:600;font-size:.9rem;line-height:1.25}
-.when small{display:block;font-weight:400;color:var(--muted)}
-.item h4{margin:0 0 2px;font-size:1.08rem;line-height:1.3;font-weight:600}
-.item .where{color:var(--muted);font-size:.9rem}
-.item .note{font-size:.93rem;margin:6px 0 8px}
 .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .price{font-size:.82rem;padding:3px 9px;border-radius:999px;background:var(--chip)}
 .price.free{background:var(--river-soft);color:var(--river);font-weight:600}
 .price.est{background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);border:1px dashed var(--gold)}
 .tag{font-size:.78rem;color:var(--muted)}
 .est{font-size:.78rem;color:var(--gold)}
-.item a{font-size:.85rem;color:var(--river)}
 .save{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--muted);font-size:1.15rem;line-height:1}
 .save[aria-pressed="true"]{background:var(--blossom);border-color:var(--blossom);color:#fff}
 .empty-note{padding:18px 0;color:var(--muted);border-top:1px solid var(--line)}
 footer{margin-top:40px;font-size:.82rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
 button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-@media (max-width:420px){.item{grid-template-columns:62px 1fr auto;gap:10px}}
 @media (prefers-reduced-motion:no-preference){.cal{transition:opacity .2s}}
 .chipline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
 .time{font-size:.85rem;font-weight:600}
 .src{font-size:.78rem;color:var(--muted)}
 .src a{color:var(--river)}
 .emptymonth{background:var(--surface);border:1px dashed var(--line);border-radius:16px;padding:18px;color:var(--muted);margin-top:14px}
-.mrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:12px}
-.mcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:6px}
-.mcard h4{margin:0;font-size:1.05rem;line-height:1.25}
 .mstat{align-self:flex-start;font-size:.78rem;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--river-soft);color:var(--river)}
 .mstat.soon{background:var(--blossom-soft);color:var(--blossom)}
-.mcard .tag{font-size:.8rem}
-.mcard .note{font-size:.9rem;margin:0}
-.mcard a{font-size:.85rem;color:var(--river)}
+
+/* ---- week strip ---- */
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;touch-action:pan-y;user-select:none}
+.day.sday{aspect-ratio:auto;min-height:70px;padding:8px 0 6px;gap:1px;border-radius:14px}
+.sday small{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.sday b{font-size:1.2rem;font-weight:600;line-height:1.1}
+.day.h3 small,.day.h4 small,.day[aria-pressed="true"] small{color:inherit;opacity:.8}
+.nav .txt{width:auto;border-radius:999px;padding:0 14px;font:inherit;font-size:.88rem;font-weight:600}
+/* ---- month popup ---- */
+.caldlg{border:0;border-radius:22px;background:var(--surface);color:var(--ink);padding:16px 16px 14px;width:min(460px,calc(100vw - 28px));max-width:none;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.caldlg::backdrop{background:rgba(8,10,28,.55)}
+.caldlg .cal-head{margin-bottom:8px}
+.caldlg .cal-head h2{font-size:clamp(1.8rem,7vw,2.6rem)}
+.caldlg .months{padding:0 0 8px}
+/* ---- tile grid ---- */
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:10px}
+.tile{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.tile.pinned{border-color:var(--blossom);box-shadow:0 0 0 2px var(--blossom-soft)}
+.topen{cursor:pointer;display:flex;flex-direction:column;flex:1;color:inherit}
+.topen:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+.tile .thumb{width:100%;height:auto;aspect-ratio:4/3;border-radius:0;margin:0}
+.tile.movie .thumb{aspect-ratio:2/3}
+.tbody{display:flex;flex-direction:column;gap:3px;padding:8px 10px 10px}
+.t4{font-weight:600;font-size:.95rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tile .where{color:var(--muted);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tmeta{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;margin-top:3px}
+.tmeta .time{font-size:.78rem;font-weight:600}
+.tmeta .price{font-size:.76rem;padding:2px 8px}
+.tile .save{position:absolute;top:8px;right:8px;width:34px;height:34px;font-size:1rem;background:color-mix(in srgb,var(--surface) 85%,transparent);backdrop-filter:blur(4px)}
+.tdetail{padding:0 10px 12px;font-size:.9rem}
+.tdetail .time{display:block;font-size:.82rem;color:var(--river)}
+.tdetail .note{margin:4px 0 6px}
+.tile.open{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
+.tile.open .topen{flex-direction:row;flex:1 1 100%}
+.tile.open .thumb{width:38%;max-width:260px;flex:0 0 auto;align-self:stretch;aspect-ratio:auto;min-height:150px}
+.tile.open.movie .thumb{width:28%;max-width:180px}
+.tile.open .tbody{flex:1;padding:12px 14px}
+.tile.open .t4{-webkit-line-clamp:unset;font-size:1.1rem}
+.tile.open .where{white-space:normal}
+.tile.open .tdetail{flex:1 1 100%;padding:0 14px 14px}
+.mstat{font-size:.74rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--river-soft);color:var(--river)}
+.mstat.soon{background:var(--blossom-soft);color:var(--blossom)}
+.tile.movie .tbody{gap:4px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>Date nights in the DMV</h1>
-    <p>Every event here has a confirmed date, time and price, checked against the organizer or an official listing. Tap a day to see exactly what’s on, switch to Any day for places that don’t need a date, or Movies for what’s playing. Heart the ones you want. Hearted events jump to the top and their days get a pink outline.</p>
+    <p>Every event here has a confirmed date, time and price, checked against the organizer or an official listing. Swipe the week or tap a date to see what’s on, open the full month to jump ahead, and tap any card for the details. Any day lists places that don’t need a date; Movies shows what’s playing. Heart the ones you want: they jump to the top and their days get a pink outline.</p>
   </header>
   <div class="views" role="group" aria-label="View">
     <button id="vCal" data-v="calView" aria-pressed="true">Calendar</button>
@@ -136,33 +161,46 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
     <button id="vMov" data-v="movView" aria-pressed="false">Movies</button>
   </div>
   <section id="calView">
-    <nav class="months" id="months" aria-label="Months"></nav>
     <div class="cal">
       <div class="banner" id="banner" aria-hidden="true"></div>
       <div class="cal-head">
         <div><h2 id="mTitle"></h2><div class="total" id="total"></div></div>
         <div class="nav">
-          <button id="prev" aria-label="Previous month">‹</button>
-          <button id="next" aria-label="Next month">›</button>
+          <button id="prevW" aria-label="Earlier week">‹</button>
+          <button id="openCal" class="txt" aria-haspopup="dialog">Month</button>
+          <button id="nextW" aria-label="Later week">›</button>
         </div>
       </div>
-      <div class="grid" id="grid"></div>
+      <div class="strip" id="strip" aria-label="This week"></div>
       <div class="legend"><span><i class="sw"></i>Darker = more going on</span><span><i class="dt"></i>One-night-only event</span><span><i class="ol"></i>Has something you hearted</span></div>
     </div>
     <div class="chips" id="chips" role="group" aria-label="Filter by type"></div>
     <div class="status" id="status"></div>
     <div class="list" id="list"></div>
   </section>
+  <dialog class="caldlg" id="calDlg" aria-label="Full calendar">
+    <div class="cal-head">
+      <div><h2 id="dTitle"></h2><div class="total" id="dTotal"></div></div>
+      <div class="nav">
+        <button id="prev" aria-label="Previous month">‹</button>
+        <button id="next" aria-label="Next month">›</button>
+        <button id="closeDlg" aria-label="Close calendar">✕</button>
+      </div>
+    </div>
+    <nav class="months" id="months" aria-label="Months"></nav>
+    <div class="grid" id="grid"></div>
+    <div class="legend"><span><i class="sw"></i>Darker = more going on</span><span><i class="dt"></i>One-night-only event</span><span><i class="ol"></i>Has something you hearted</span></div>
+  </dialog>
   <section id="anyView" hidden>
     <h3 class="sec">Any day</h3>
-    <p class="status">No date needed. Open most days, with hours and prices checked. Heart one and it stays at the top.</p>
+    <p class="status">No date needed. Open most days, with hours and prices checked. Tap a card for details. Heart one and it stays at the top.</p>
     <div class="chips" id="anyChips" role="group" aria-label="Filter any-day ideas"></div>
     <div class="list" id="anyList"></div>
   </section>
   <section id="movView" hidden>
     <h3 class="sec">Movies</h3>
-    <p class="status" id="movStatus">Top picks in theaters now and opening soon. Refreshed with the weekly update.</p>
-    <div class="mrow" id="movRow"></div>
+    <p class="status" id="movStatus">Top picks in theaters now and opening soon. Tap a poster for details. Refreshed with the weekly update.</p>
+    <div class="list" id="movRow"></div>
   </section>
   <footer>Checked November 25, 2026. Events with a confirmed date, time and price are listed as confirmed. A few big ones whose price isn’t published yet are included with an estimated price, marked in gold. Saved ideas stay on this device.</footer>
 </div>
@@ -597,43 +635,72 @@ const MN=["January","February","March","April","May","June","July","August","Sep
 const MS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const TODAY=(d=>new Date(d.getFullYear(),d.getMonth(),d.getDate()))(new Date());
-let mi=Math.max(0,MONTHS.findIndex(M=>M.y===TODAY.getFullYear()&&M.m===TODAY.getMonth())),cat="all",selDay=MONTHS.some(M=>M.y===TODAY.getFullYear()&&M.m===TODAY.getMonth())?TODAY.getDate():null,saved=new Set();
+let cat="all",saved=new Set(),openIds=new Set(),mi=0;
 try{saved=new Set(JSON.parse(localStorage.getItem("dmvDateSaved2")||"[]"));}catch(e){}
 function persist(){try{localStorage.setItem("dmvDateSaved2",JSON.stringify([...saved]));}catch(e){}}
+const addD=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
+const RMIN=new Date(MONTHS[0].y,MONTHS[0].m,1),RMAX=new Date(MONTHS[MONTHS.length-1].y,MONTHS[MONTHS.length-1].m+1,0);
+const clampStart=d=>d<RMIN?RMIN:d>addD(RMAX,-6)?addD(RMAX,-6):d;
+const inRange=TODAY>=RMIN&&TODAY<=RMAX;
+let start=clampStart(TODAY),selKey=inRange?iso(TODAY):null;
 const val=(v,k)=> typeof v==="string"?v:(v[k]||(v.dow?v.dow[P(k).getDay()]:""));
 const priceStr=(it,k)=> typeof it.p==="string"?it.p:(k?val(it.p,k):(it.p.dow?(it.p.dow[1]===it.p.dow[5]?it.p.dow[1]:`Mon–Thu ${it.p.dow[1]}, Fri–Sat ${it.p.dow[5]}, Sun ${it.p.dow[0]}`):Object.values(it.p).join(" / ")));
 const timeStr=(it,k)=> typeof it.time==="string"?it.time:(k?val(it.time,k):(it.time.dow?"Mon–Thu "+it.time.dow[1]+"; Fri–Sat "+it.time.dow[5]+"; Sun "+it.time.dow[0]:Object.entries(it.time).map(([d,t])=>DOW[P(d).getDay()]+" "+t).join(", ")));
 const isSpecial=it=>it.days.length<=3;
 const isFree=it=>!it.est&&/^free/i.test(priceStr(it));
 const catOk=it=>cat==="all"||(cat==="free"?isFree(it):it.c===cat);
-const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function daysLabel(it,y,m){
-  const ds=it.days.filter(k=>{const d=P(k);return d.getFullYear()===y&&d.getMonth()===m;});
-  if(ds.length<=4) return ds.map(k=>`${DOW[P(k).getDay()]} ${MS[m]} ${P(k).getDate()}`).join(", ");
-  return `${ds.length} days this month, ${MS[m]} ${P(ds[0]).getDate()}–${P(ds[ds.length-1]).getDate()}`;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtD=k=>{const d=P(k);return `${DOW[d.getDay()]} ${MS[d.getMonth()]} ${d.getDate()}`;};
+const weekKeys=()=>Array.from({length:7},(_,i)=>iso(addD(start,i)));
+const inWin=it=>{const ks=weekKeys();return it.days.filter(k=>ks.includes(k));};
+function tile(o){
+  const on=saved.has(o.id),open=openIds.has(o.id);
+  return `<article class="tile${on?" pinned":""}${open?" open":""}${o.movie?" movie":""}" data-id="${o.id}">
+    <div class="topen" role="button" tabindex="0" data-open="${o.id}" aria-expanded="${open}" aria-label="${esc(o.t)}, ${open?"hide":"show"} details">
+      ${thumb({img:o.img,c:o.c||"culture",id:o.id})}
+      <span class="tbody"><span class="t4">${esc(o.t)}</span>${o.w?`<span class="where">${esc(o.w)}</span>`:""}
+        <span class="tmeta">${o.badge||""}${o.time?`<span class="time">🕒 ${esc(o.time)}</span>`:""}${o.price!==undefined?`<span class="price${o.priceCls||""}">${esc(o.price)}</span>`:""}</span>
+      </span>
+    </div>
+    ${o.heart===false?"":`<button class="save" data-id="${o.id}" aria-pressed="${on}" aria-label="${on?"Unheart":"Heart"} ${esc(o.t)}">${on?"♥":"♡"}</button>`}
+    <div class="tdetail"${open?"":" hidden"}>${o.when?`<span class="time">${esc(o.when)}</span>`:""}${o.estNote?`<div class="est">Price not published; our guess</div>`:""}<p class="note">${esc(o.note||"")}</p>${o.u?`<div class="src">${o.srcPre||""} <a href="${o.u}" target="_blank" rel="noopener">${esc(o.src||"Details")}</a></div>`:""}</div>
+  </article>`;
 }
 function card(it,ctx){
-  const on=saved.has(it.id);
-  const k=ctx.day||null;
-  const when=k?`${DOW[P(k).getDay()]} ${MS[P(k).getMonth()]} ${P(k).getDate()}`:(ctx.y!==undefined?daysLabel(it,ctx.y,ctx.m):`${MS[P(it.days[0]).getMonth()]} ${P(it.days[0]).getDate()} – ${MS[P(it.days[it.days.length-1]).getMonth()]} ${P(it.days[it.days.length-1]).getDate()}`);
-  return `<article class="item${on?" pinned":""}"><div class="when">${thumb(it)}</div><div>
-    <h4>${esc(it.t)}</h4><div class="where">${esc(it.w)}</div>
-    <div class="chipline"><span class="time">${esc(when)}</span></div>
-    <div class="chipline"><span class="tag">🕒 ${esc(timeStr(it,k))}</span></div>
-    <div class="chipline"><span class="price${it.est?" est":isFree(it)?" free":""}">${it.est?"Est. ":""}${esc(priceStr(it,k))}</span>${it.est?`<span class="est">Price not published; our guess</span>`:""}</div>
-    <p class="note">${esc(it.n)}</p>
-    <div class="src">${it.est?"Date and time via":"Confirmed via"} <a href="${it.u}" target="_blank" rel="noopener">${esc(it.s)}</a></div>
-  </div><button class="save" data-id="${it.id}" aria-pressed="${on}" aria-label="${on?"Unheart":"Heart"} ${esc(it.t)}">${on?"♥":"♡"}</button></article>`;
+  const ds=inWin(it);const k=ctx.day||ds[0]||it.days[0];
+  const when=ctx.day?fmtD(k):(ds.length>=6?"Every day this week":ds.map(fmtD).join(", "));
+  return tile({id:it.id,c:it.c,img:it.img,t:it.t,w:it.w,time:timeStr(it,k),price:(it.est?"Est. ":"")+priceStr(it,k),priceCls:it.est?" est":isFree(it)?" free":"",estNote:it.est,when,note:it.n,u:it.u,src:it.s,srcPre:it.est?"Date and time via":"Confirmed via"});
 }
 function render(){
+  const end=addD(start,6),keys=weekKeys(),sm=start.getMonth(),em=end.getMonth();
+  document.getElementById("banner").innerHTML=SCENES[seasonOf((selKey&&keys.includes(selKey)?P(selKey):start).getMonth())];
+  document.getElementById("mTitle").innerHTML=`${sm===em?MN[sm]:MS[sm]+"–"+MS[em]}<small>${MS[sm]} ${start.getDate()} – ${MS[em]} ${end.getDate()}, ${end.getFullYear()}</small>`;
+  document.getElementById("prevW").disabled=start<=RMIN;
+  document.getElementById("nextW").disabled=end>=RMAX;
+  const inW=ITEMS.filter(it=>catOk(it)&&it.days.some(k=>keys.includes(k)));
+  document.getElementById("total").textContent=`${inW.length} event${inW.length===1?"":"s"} this week`;
+  const cnt=keys.map(k=>inW.filter(it=>it.days.includes(k)).length),maxN=Math.max(1,...cnt);
+  document.getElementById("strip").innerHTML=keys.map((k,i)=>{const d=P(k),n=cnt[i],sp=inW.filter(it=>it.days.includes(k)&&isSpecial(it)).length;
+    const cls=["day","sday"];if(n)cls.push("has","h"+Math.ceil(4*n/maxN));if(+d===+TODAY)cls.push("today");if(d<TODAY)cls.push("past");if(ITEMS.some(it=>saved.has(it.id)&&it.days.includes(k)))cls.push("saved");
+    return `<button class="${cls.join(" ")}" data-k="${k}" aria-pressed="${selKey===k}" aria-label="${DOW[d.getDay()]} ${MN[d.getMonth()]} ${d.getDate()}: ${n} event${n===1?"":"s"}${sp?`, ${sp} one-night-only`:""}${cls.includes("saved")?", includes something you hearted":""}"><small>${DOW[d.getDay()]}</small><b>${d.getDate()}</b><span class="dots">${"<i></i>".repeat(Math.min(sp,3))}</span></button>`;}).join("");
+  const st=document.getElementById("status");let list,ctx;
+  const todayBtn=inRange&&!keys.includes(iso(TODAY))?` <button id="goToday">Back to today</button>`:"";
+  if(selKey&&keys.includes(selKey)){list=inW.filter(it=>it.days.includes(selKey));ctx={day:selKey};
+    st.innerHTML=`${list.length} event${list.length===1?"":"s"} on ${fmtD(selKey)}. <button id="clearDay">Show all 7 days</button>${todayBtn}`;}
+  else{list=inW;ctx={};st.innerHTML=`Everything ${MS[sm]} ${start.getDate()} – ${MS[em]} ${end.getDate()}. Tap a date to narrow it.${todayBtn}`;}
+  list.sort((a,b)=>(saved.has(b.id)-saved.has(a.id))||(ctx.day?0:inWin(a)[0].localeCompare(inWin(b)[0])));
+  document.getElementById("list").innerHTML=list.length?list.map(it=>card(it,ctx)).join(""):`<div class="emptymonth">${ctx.day?"Nothing confirmed for this day yet.":"Nothing confirmed for these days and this filter yet."}</div>`;
+  if(document.getElementById("calDlg").open)renderGrid();
+  renderAny();renderMovies();
+}
+function renderGrid(){
   const {y,m}=MONTHS[mi];
-  document.getElementById("banner").innerHTML=SCENES[seasonOf(m)];
-  document.getElementById("mTitle").innerHTML=`${MN[m]}<small>${y}</small>`;
+  document.getElementById("dTitle").innerHTML=`${MN[m]}<small>${y}</small>`;
   document.getElementById("prev").disabled=mi===0;
   document.getElementById("next").disabled=mi===MONTHS.length-1;
   document.getElementById("months").innerHTML=MONTHS.map((M,i)=>`<button data-i="${i}" aria-current="${i===mi}">${MS[M.m]} ’${String(M.y).slice(2)}</button>`).join("");
   const inM=ITEMS.filter(it=>catOk(it)&&it.days.some(k=>{const d=P(k);return d.getFullYear()===y&&d.getMonth()===m;}));
-  document.getElementById("total").textContent=`${inM.length} confirmed event${inM.length===1?"":"s"}`;
+  document.getElementById("dTotal").textContent=`${inM.length} event${inM.length===1?"":"s"} this month`;
   const first=new Date(y,m,1).getDay(),nd=new Date(y,m+1,0).getDate();
   let g=["S","M","T","W","T","F","S"].map(d=>`<div class="dow" aria-hidden="true">${d}</div>`).join("");
   for(let i=0;i<first;i++)g+=`<div class="day empty"></div>`;
@@ -641,41 +708,41 @@ function render(){
   for(let d=1;d<=nd;d++){
     const k=iso(new Date(y,m,d));const on=inM.filter(it=>it.days.includes(k));const n=on.length;const sp=on.filter(isSpecial).length;
     const cls=["day"];if(n)cls.push("has","h"+Math.ceil(4*n/maxN));if(+new Date(y,m,d)===+TODAY)cls.push("today");if(new Date(y,m,d)<TODAY)cls.push("past");if(ITEMS.some(it=>saved.has(it.id)&&it.days.includes(k)))cls.push("saved");
-    g+=`<button class="${cls.join(" ")}" data-d="${d}" aria-pressed="${selDay===d}" aria-label="${MN[m]} ${d}: ${n} event${n===1?"":"s"}${sp?`, ${sp} one-night-only`:""}${cls.includes("saved")?", includes something you hearted":""}">${d}<span class="dots">${"<i></i>".repeat(Math.min(sp,3))}</span></button>`;
+    g+=`<button class="${cls.join(" ")}" data-k="${k}" aria-pressed="${selKey===k}" aria-label="${MN[m]} ${d}: ${n} event${n===1?"":"s"}${sp?`, ${sp} one-night-only`:""}${cls.includes("saved")?", includes something you hearted":""}">${d}<span class="dots">${"<i></i>".repeat(Math.min(sp,3))}</span></button>`;
   }
   document.getElementById("grid").innerHTML=g;
-  const st=document.getElementById("status");let list,ctx;
-  if(selDay){const k=iso(new Date(y,m,selDay));list=inM.filter(it=>it.days.includes(k));ctx={day:k};
-    st.innerHTML=`${list.length} event${list.length===1?"":"s"} on ${DOW[new Date(y,m,selDay).getDay()]}, ${MN[m]} ${selDay}. <button id="clearDay">Show the whole month</button>`;}
-  else{list=inM;ctx={y,m};st.textContent="";}
-  list.sort((a,b)=>(saved.has(b.id)-saved.has(a.id))||P(a.days.find(k=>P(k).getMonth()===m&&P(k).getFullYear()===y))-P(b.days.find(k=>P(k).getMonth()===m&&P(k).getFullYear()===y)));
-  document.getElementById("list").innerHTML=list.length?list.map(it=>card(it,ctx)).join(""):`<div class="emptymonth">${selDay?"Nothing confirmed for this day yet.":"Nothing confirmed for this month and filter yet."}</div>`;
-  renderAny();renderMovies();
 }
-function anyCard(it){
-  const on=saved.has(it.id);
-  return `<article class="item${on?" pinned":""}"><div class="when">${thumb(it)}</div><div>
-    <h4>${esc(it.t)}</h4><div class="where">${esc(it.w)}</div>
-    <div class="chipline"><span class="time">Any day</span></div>
-    <div class="chipline"><span class="tag">🕒 ${esc(it.time)}</span></div>
-    <div class="chipline"><span class="price${/^free/i.test(it.p)?" free":""}">${esc(it.p)}</span></div>
-    <p class="note">${esc(it.n)}</p>
-    <div class="src">Confirmed via <a href="${it.u}" target="_blank" rel="noopener">${esc(it.s)}</a></div>
-  </div><button class="save" data-id="${it.id}" aria-pressed="${on}" aria-label="${on?"Unheart":"Heart"} ${esc(it.t)}">${on?"♥":"♡"}</button></article>`;
-}
+function anyCard(it){return tile({id:it.id,c:it.c,img:it.img,t:it.t,w:it.w,time:it.time,price:it.p,priceCls:/^free/i.test(it.p)?" free":"",when:"Any day",note:it.n,u:it.u,src:it.s,srcPre:"Confirmed via"});}
 function renderAny(){const l=ANYTIME.filter(it=>acat==="all"||(acat==="free"?/^free/i.test(it.p):it.c===acat)).sort((a,b)=>saved.has(b.id)-saved.has(a.id));document.getElementById("anyList").innerHTML=l.length?l.map(anyCard).join(""):`<div class="emptymonth">Nothing in this category.</div>`;}
-function renderMovies(){const el=document.getElementById("movRow");if(!el)return;const today=iso(TODAY);const l=[...MOVIES].sort((a,b)=>(a.date>today)-(b.date>today)||(a.date>today?a.date.localeCompare(b.date):b.date.localeCompare(a.date)));el.innerHTML=l.length?l.map(m=>{const out=m.date<=today;const d=P(m.date);return `<article class="mcard">${m.img?`<img class="mposter" src="${esc(m.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:""}<span class="mstat${out?"":" soon"}">${out?"In theaters":"Opens "+MS[d.getMonth()]+" "+d.getDate()}</span><h4>${esc(m.t)}</h4><span class="tag">${esc(m.genre||"")}${m.rating?" · "+esc(m.rating):""}${out?" · since "+MS[d.getMonth()]+" "+d.getDate():""}</span><p class="note">${esc(m.n)}</p>${m.u?`<a href="${m.u}" target="_blank" rel="noopener">Details</a>`:""}</article>`}).join(""):`<div class="emptymonth">No movies listed yet.</div>`;}
+function renderMovies(){const el=document.getElementById("movRow");if(!el)return;const today=iso(TODAY);const l=MOVIES.map((m,i)=>({...m,id:"mv"+i})).sort((a,b)=>(a.date>today)-(b.date>today)||(a.date>today?a.date.localeCompare(b.date):b.date.localeCompare(a.date)));
+  el.innerHTML=l.length?l.map(m=>{const out=m.date<=today;const d=P(m.date);return tile({id:m.id,c:"culture",img:m.img,t:m.t,movie:true,heart:false,badge:`<span class="mstat${out?"":" soon"}">${out?"In theaters":"Opens "+MS[d.getMonth()]+" "+d.getDate()}</span>`,time:"",price:undefined,w:[m.genre,m.rating].filter(Boolean).join(" · "),when:out?"In theaters since "+MS[d.getMonth()]+" "+d.getDate():"Opens "+fmtD(m.date),note:m.n,u:m.u,src:"Details"});}).join(""):`<div class="emptymonth">No movies listed yet.</div>`;}
 document.getElementById("anyChips").innerHTML=ANYCATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===acat}">${l}</button>`).join("");
 document.getElementById("anyChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;acat=b.dataset.c;document.querySelectorAll("#anyChips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===acat));renderAny();});
 document.querySelector(".views").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;document.querySelectorAll(".views button").forEach(x=>{x.setAttribute("aria-pressed",x===b);document.getElementById(x.dataset.v).hidden=x!==b;});});
 document.getElementById("chips").innerHTML=CATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===cat}">${l}</button>`).join("");
 document.getElementById("chips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.c;document.querySelectorAll("#chips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===cat));render();});
-document.getElementById("months").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;mi=+b.dataset.i;selDay=null;render();});
-document.getElementById("prev").onclick=()=>{if(mi>0){mi--;selDay=null;render();}};
-document.getElementById("next").onclick=()=>{if(mi<MONTHS.length-1){mi++;selDay=null;render();}};
-document.getElementById("grid").addEventListener("click",e=>{const b=e.target.closest(".day");if(!b||!b.dataset.d)return;const d=+b.dataset.d;selDay=selDay===d?null:d;render();});
-document.getElementById("status").addEventListener("click",e=>{if(e.target.id==="clearDay"){selDay=null;render();}});
-document.body.addEventListener("click",e=>{const b=e.target.closest(".save");if(!b)return;const id=b.dataset.id;saved.has(id)?saved.delete(id):saved.add(id);persist();render();});
+const shiftWeek=n=>{const ns=clampStart(addD(start,n));if(+ns===+start)return;start=ns;selKey=null;render();};
+document.getElementById("prevW").onclick=()=>shiftWeek(-7);
+document.getElementById("nextW").onclick=()=>shiftWeek(7);
+const strip=document.getElementById("strip");let tx=null,ty=null;
+strip.addEventListener("click",e=>{const b=e.target.closest(".sday");if(!b)return;selKey=selKey===b.dataset.k?null:b.dataset.k;render();});
+strip.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+strip.addEventListener("touchend",e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=ty=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))shiftWeek(dx<0?7:-7);});
+document.getElementById("calView").addEventListener("keydown",e=>{if(e.target.closest(".strip")){if(e.key==="ArrowLeft")shiftWeek(-7);if(e.key==="ArrowRight")shiftWeek(7);}});
+const dlg=document.getElementById("calDlg");
+document.getElementById("openCal").onclick=()=>{const d=selKey?P(selKey):start;mi=Math.max(0,MONTHS.findIndex(M=>M.y===d.getFullYear()&&M.m===d.getMonth()));renderGrid();dlg.showModal();};
+document.getElementById("closeDlg").onclick=()=>dlg.close();
+dlg.addEventListener("click",e=>{if(e.target===dlg)dlg.close();});
+document.getElementById("months").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;mi=+b.dataset.i;renderGrid();});
+document.getElementById("prev").onclick=()=>{if(mi>0){mi--;renderGrid();}};
+document.getElementById("next").onclick=()=>{if(mi<MONTHS.length-1){mi++;renderGrid();}};
+document.getElementById("grid").addEventListener("click",e=>{const b=e.target.closest(".day");if(!b||!b.dataset.k)return;selKey=b.dataset.k;start=clampStart(P(selKey));dlg.close();render();});
+document.getElementById("status").addEventListener("click",e=>{if(e.target.id==="clearDay"){selKey=null;render();}if(e.target.id==="goToday"){start=clampStart(TODAY);selKey=iso(TODAY);render();}});
+document.body.addEventListener("click",e=>{
+  const h=e.target.closest(".save");if(h){const id=h.dataset.id;saved.has(id)?saved.delete(id):saved.add(id);persist();render();return;}
+  const o=e.target.closest(".topen");if(o){const id=o.dataset.open;openIds.has(id)?openIds.delete(id):openIds.add(id);render();}
+});
+document.body.addEventListener("keydown",e=>{const o=e.target.closest&&e.target.closest(".topen");if(o&&(e.key==="Enter"||e.key===" ")){e.preventDefault();o.click();}});
 persist();render();
 </script>
 </body>
