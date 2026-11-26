@@ -133,13 +133,14 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 .tile.movie .thumb{aspect-ratio:2/3}
 .tbody{display:flex;flex-direction:column;gap:3px;padding:8px 10px 10px}
 .t4{font-weight:600;font-size:.95rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.tile .where{color:var(--muted);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .where{color:var(--ink);font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tmeta{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;margin-top:3px}
 .tmeta .time{font-size:.78rem;font-weight:600}
 .tmeta .price{font-size:.76rem;padding:2px 8px}
 .tile .save{position:absolute;top:8px;right:8px;width:34px;height:34px;font-size:1rem;background:color-mix(in srgb,var(--surface) 85%,transparent);backdrop-filter:blur(4px)}
 .tdetail{padding:0 10px 12px;font-size:.9rem}
 .tdetail .time{display:block;font-size:.82rem;color:var(--river)}
+.tdetail .addr{font-size:.85rem;color:var(--muted);margin-bottom:4px}
 .tdetail .hours{font-size:.85rem;font-weight:600;margin-top:4px}
 .tdetail .note{margin:4px 0 6px;white-space:pre-line}
 .tile.open{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
@@ -604,6 +605,17 @@ const timeStr=(it,k)=> typeof it.time==="string"?it.time:(k?val(it.time,k):(it.t
 const isFree=it=>!it.est&&/^free/i.test(priceStr(it));
 const catOk=it=>cat==="all"||(cat==="free"?isFree(it):it.c===cat);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ROADS="(?!\\s+(?:Rd|Ave|St|Pike|Blvd|Dr|Hwy|Ct|Ln|Pkwy|Cir|Way|Trail|Point)\\b)";
+const TOWNS=[
+ ["McLean, VA and Potomac","McLean, VA & Potomac, MD"],["across MD and NoVA","MD & Northern VA"],["Venues around DC","Around DC"],
+ ["Mount Vernon Triangle","Mt Vernon Triangle, DC"],["George Washington’s Mount Vernon","Mount Vernon, VA"],["Arlington National Cemetery","Arlington, VA"],
+ ["National Zoo","Woodley Park, DC"],["Botanic Garden","National Mall, DC"],["National Gallery","National Mall, DC"],["Nationals Park","Navy Yard, DC"],["Kent Island","Stevensville, MD"],["Potomac Overlook","Arlington, VA"],["Columbia Heights","Columbia Heights, DC"],["Rotating venues","DC, MD & VA"],["Walter E. Washington Convention","Mt Vernon Square, DC"],
+ ...["Clarendon","Ballston","Rosslyn","Crystal City","Shirlington"].map(t=>[t,"Arlington, VA"]),
+ ...["North Bethesda","Bethesda","Rockville","Silver Spring","Wheaton","Kensington","Glen Echo","Gaithersburg","Germantown","Olney","Chevy Chase","Hyattsville","Bladensburg","Brentwood","Oxon Hill","National Harbor","Greenbelt","College Park","Laurel","Jessup","Dickerson","Thurmont","Frederick","Crownsville","Crofton","Annapolis","Stevensville","Ellicott City","Columbia","Towson","Timonium","Sparrows Point","Dundalk","Baltimore"].map(t=>[t,t+", MD"]),
+ ...["Tysons","McLean","Vienna","Falls Church","Fairfax","Reston","Herndon","Sterling","Dulles","Centreville","Springfield","Annandale","Woodbridge","Great Falls","Alexandria","Arlington","Mount Vernon"].map(t=>[t,t+", VA"]),
+ ...["Dupont","Georgetown","Union Market","NoMa","Columbia Heights","Logan Circle","Bloomingdale","Adams Morgan","Woodley Park","Kalorama","Penn Quarter","Capitol Hill","Shaw","The Wharf","Southwest Waterfront","National Mall","Brookland","Deanwood","Congress Heights","Forest Hills","Cleveland Park","Takoma","Rock Creek Park","Fort Totten","Buzzard Point","McPherson Square","Judiciary Square","Foggy Bottom","Mt Pleasant","American University","Ward 8","Downtown DC"].map(t=>[t,t.replace(/ DC$/,"")+", DC"]),
+].map(([k,v])=>[new RegExp("\\b"+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+(/,/.test(v)&&!/&|Around/.test(v)?ROADS:""),"i"),v]);
+const townOf=it=>{if(it.loc)return it.loc;const w=it.w||"";for(const [re,v] of TOWNS)if(re.test(w))return v;return /\b(NW|NE|SE|SW)\b|\bDC\b/.test(w)?"Washington, DC":w;};
 const fmtD=k=>{const d=P(k);return `${DOW[d.getDay()]} ${MS[d.getMonth()]} ${d.getDate()}`;};
 const weekKeys=()=>Array.from({length:7},(_,i)=>iso(addD(start,i)));
 const inWin=it=>{const ks=weekKeys();return it.days.filter(k=>ks.includes(k));};
@@ -612,18 +624,18 @@ function tile(o){
   return `<article class="tile${on?" pinned":""}${open?" open":""}${o.movie?" movie":""}" data-id="${o.id}">
     <div class="topen" role="button" tabindex="0" data-open="${o.id}" aria-expanded="${open}" aria-label="${esc(o.t)}, ${open?"hide":"show"} details">
       ${thumb({img:o.img,c:o.c||"culture",id:o.id})}
-      <span class="tbody"><span class="t4">${esc(o.t)}</span>${o.w?`<span class="where">${esc(o.w)}</span>`:""}
+      <span class="tbody"><span class="t4">${esc(o.t)}</span>${o.town||o.w?`<span class="where">${o.town?"📍 ":""}${esc(o.town||o.w)}</span>`:""}
         <span class="tmeta">${o.badge||""}${o.time?`<span class="time">🕒 ${esc(o.time)}</span>`:""}${o.price!==undefined?`<span class="price${o.priceCls||""}">${esc(o.price)}</span>`:""}</span>
       </span>
     </div>
     ${o.heart===false?"":`<button class="save" data-id="${o.id}" aria-pressed="${on}" aria-label="${on?"Unheart":"Heart"} ${esc(o.t)}">${on?"♥":"♡"}</button>`}
-    <div class="tdetail"${open?"":" hidden"}>${o.when?`<span class="time">${esc(o.when)}</span>`:""}${o.hours&&o.hours!==o.time?`<div class="hours">🕒 ${esc(o.hours)}</div>`:""}${o.estNote?`<div class="est">Price not published; our guess</div>`:""}<p class="note">${esc(o.note||"")}</p>${o.u?`<div class="src">${o.srcPre||""} <a href="${o.u}" target="_blank" rel="noopener">${esc(o.src||"Details")}</a></div>`:""}</div>
+    <div class="tdetail"${open?"":" hidden"}>${o.town&&o.w?`<div class="addr">${esc(o.w)}</div>`:""}${o.when?`<span class="time">${esc(o.when)}</span>`:""}${o.hours&&o.hours!==o.time?`<div class="hours">🕒 ${esc(o.hours)}</div>`:""}${o.estNote?`<div class="est">Price not published; our guess</div>`:""}<p class="note">${esc(o.note||"")}</p>${o.u?`<div class="src">${o.srcPre||""} <a href="${o.u}" target="_blank" rel="noopener">${esc(o.src||"Details")}</a></div>`:""}</div>
   </article>`;
 }
 function card(it,ctx){
   const ds=inWin(it);const k=ctx.day||ds[0]||it.days[0];
   const when=ctx.day?fmtD(k):(ds.length>=6?"Every day this week":ds.map(fmtD).join(", "));
-  return tile({id:it.id,c:it.c,img:it.img,t:it.t,w:it.w,time:timeStr(it,k),hours:it.tfull||(typeof it.time=="string"?"":timeStr(it)),price:(it.est?"Est. ":"")+priceStr(it,k),priceCls:it.est?" est":isFree(it)?" free":"",estNote:it.est,when,note:it.n,u:it.u,src:it.s,srcPre:it.est?"Date and time via":"Confirmed via"});
+  return tile({id:it.id,c:it.c,img:it.img,t:it.t,w:it.w,town:townOf(it),time:timeStr(it,k),hours:it.tfull||(typeof it.time=="string"?"":timeStr(it)),price:(it.est?"Est. ":"")+priceStr(it,k),priceCls:it.est?" est":isFree(it)?" free":"",estNote:it.est,when,note:it.n,u:it.u,src:it.s,srcPre:it.est?"Date and time via":"Confirmed via"});
 }
 function render(){
   const end=addD(start,6),keys=weekKeys(),sm=start.getMonth(),em=end.getMonth();
@@ -665,7 +677,7 @@ function renderGrid(){
   }
   document.getElementById("grid").innerHTML=g;
 }
-function anyCard(it){return tile({id:it.id,c:it.c,img:it.img,t:it.t,w:it.w,time:it.hrs?`Today ${it.hrs[TODAY.getDay()]}`:it.time,hours:it.time,price:it.p,priceCls:/^free/i.test(it.p)?" free":"",when:"Any day",note:it.n,u:it.u,src:it.s,srcPre:"Confirmed via"});}
+function anyCard(it){return tile({id:it.id,c:it.c,img:it.img,t:it.t,w:it.w,town:townOf(it),time:it.hrs?`Today ${it.hrs[TODAY.getDay()]}`:it.time,hours:it.time,price:it.p,priceCls:/^free/i.test(it.p)?" free":"",when:"Any day",note:it.n,u:it.u,src:it.s,srcPre:"Confirmed via"});}
 function renderAny(){const l=ANYTIME.filter(it=>acat==="all"||(acat==="free"?/^free/i.test(it.p):it.c===acat)).sort((a,b)=>saved.has(b.id)-saved.has(a.id));document.getElementById("anyList").innerHTML=l.length?l.map(anyCard).join(""):`<div class="emptymonth">Nothing in this category.</div>`;}
 function renderMovies(){const el=document.getElementById("movRow");if(!el)return;const today=iso(TODAY);const l=MOVIES.map((m,i)=>({...m,id:"mv"+i,i})).sort((a,b)=>(a.date>today)-(b.date>today)||(a.date>today?a.date.localeCompare(b.date):a.i-b.i));
   el.innerHTML=l.length?l.map(m=>{const out=m.date<=today;const d=P(m.date);return tile({id:m.id,c:"culture",img:m.img,t:m.t,movie:true,heart:false,badge:`<span class="mstat${out?"":" soon"}">${out?"In theaters":"Opens "+MS[d.getMonth()]+" "+d.getDate()}</span>`,time:"",price:undefined,w:[m.genre,m.rating].filter(Boolean).join(" · "),time:m.leaves?(out?"Until about "+MS[P(m.leaves).getMonth()]+" "+P(m.leaves).getDate():""):"",when:(out?"In theaters since "+MS[d.getMonth()]+" "+d.getDate():"Opens "+fmtD(m.date))+(m.leaves?"; expected to leave theaters around "+fmtD(m.leaves)+(m.leavesNote?" ("+m.leavesNote+")":""):""),note:m.n,u:m.u,src:"Details"});}).join(""):`<div class="emptymonth">No movies listed yet.</div>`;}
