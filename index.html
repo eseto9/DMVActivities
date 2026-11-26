@@ -62,23 +62,14 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .dow{font-size:.75rem;color:var(--muted);padding:4px 0}
 .day{position:relative;aspect-ratio:1;border:0;border-radius:12px;background:transparent;color:var(--ink);font:inherit;font-size:.95rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 .day.empty{visibility:hidden}
-.day.h1{background:color-mix(in srgb,var(--river) 14%,transparent)}
-.day.h2{background:color-mix(in srgb,var(--river) 34%,transparent)}
-.day.h3{background:color-mix(in srgb,var(--river) 62%,transparent);color:var(--bg)}
-.day.h4{background:var(--river);color:var(--bg)}
 .day.saved{box-shadow:inset 0 0 0 3px var(--blossom)}
 .day.past{opacity:.35}
 .day.has{font-weight:600}
-.day .dots{display:flex;gap:2px;height:6px}
-.day .dots i{width:6px;height:6px;border-radius:50%;background:var(--blossom)}
 .day[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
-.day[aria-pressed="true"] .dots i{background:var(--bg)}
 .day.today{outline:2px solid var(--gold);outline-offset:-2px}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted);margin-top:12px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
-.legend .sw{width:44px;height:12px;border-radius:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--river) 14%,transparent),var(--river))}
 .legend .ol{width:14px;height:14px;border-radius:4px;box-shadow:inset 0 0 0 3px var(--blossom)}
-.legend .dt{width:7px;height:7px;border-radius:50%;background:var(--blossom)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 6px}
 .chips button{padding:6px 13px;font-size:.88rem}
 .chips button[aria-pressed="true"]{background:var(--blossom);border-color:var(--blossom);color:#fff}
@@ -107,11 +98,24 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 
 /* ---- week strip ---- */
 .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;touch-action:pan-y;user-select:none}
-.day.sday{aspect-ratio:auto;min-height:84px;padding:8px 0 6px;gap:1px;border-radius:14px}
+.day.sday{aspect-ratio:auto;min-height:118px;padding:8px 2px 8px;gap:2px;border-radius:14px;justify-content:flex-start;background:var(--chip)}
+.sday .wxi{font-size:1.7rem;line-height:1;margin:4px 0 2px}
+.sday .hi{font-size:1rem;font-weight:700;line-height:1}
+.sday .lo{font-size:.72rem;color:var(--muted);line-height:1.1}
+.sday .rain{font-size:.66rem;font-weight:700;color:var(--river);line-height:1.1}
+.sday .nofc{font-size:.66rem;color:var(--muted);margin-top:10px;line-height:1.2}
+.day.wx-sun{background:color-mix(in srgb,#F2B33D 26%,var(--surface))}
+.day.wx-part{background:color-mix(in srgb,#F2B33D 12%,var(--chip))}
+.day.wx-cloud{background:color-mix(in srgb,#8A93AD 22%,var(--surface))}
+.day.wx-fog{background:color-mix(in srgb,#8A93AD 16%,var(--surface))}
+.day.wx-rain{background:color-mix(in srgb,#3E7CB1 26%,var(--surface))}
+.day.wx-snow{background:color-mix(in srgb,#A9D4F5 40%,var(--surface))}
+.day.wx-storm{background:color-mix(in srgb,#5B4B8A 30%,var(--surface))}
+.day[aria-pressed="true"] small,.day[aria-pressed="true"] .lo,.day[aria-pressed="true"] .rain,.day[aria-pressed="true"] .nofc{color:inherit;opacity:.85}
+.grid .day .mwx{font-size:.72rem;line-height:1}
+.day.day[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .sday small{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600}
 .sday b{font-size:1.2rem;font-weight:600;line-height:1.1}
-.sday .wx{font-size:.66rem;font-weight:600;line-height:1.1;white-space:nowrap;margin-top:2px}
-.day.h3 small,.day.h4 small,.day[aria-pressed="true"] small{color:inherit;opacity:.8}
 .nav .txt{width:auto;border-radius:999px;padding:0 14px;font:inherit;font-size:.88rem;font-weight:600}
 /* ---- month popup ---- */
 .caldlg{border:0;border-radius:22px;background:var(--surface);color:var(--ink);padding:16px 16px 14px;width:min(460px,calc(100vw - 28px));max-width:none;box-shadow:0 24px 60px rgba(0,0,0,.35)}
@@ -155,7 +159,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 <div class="wrap">
   <header>
     <h1>Date nights in the DMV</h1>
-    <p>Every event here has a confirmed date, time and price, checked against the organizer or an official listing. Swipe the week or tap a date to see what’s on, open the full month to jump ahead, and tap any card for the details. Any day lists places that don’t need a date; Movies shows what’s playing. Heart the ones you want: they jump to the top and their days get a pink outline.</p>
+    <p>Every event here has a confirmed date, time and price, checked against the organizer or an official listing. Swipe the week or tap a date to see what’s on, open the full month to jump ahead, and tap any card for the details. Any day lists places that don’t need a date; Movies shows what’s playing. Each day shows its forecast. Heart the ones you want: they jump to the top and their days get a pink outline.</p>
   </header>
   <div class="views" role="group" aria-label="View">
     <button id="vCal" data-v="calView" aria-pressed="true">Calendar</button>
@@ -174,7 +178,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
         </div>
       </div>
       <div class="strip" id="strip" aria-label="This week"></div>
-      <div class="legend"><span><i class="sw"></i>Darker = more going on</span><span><i class="dt"></i>One-night-only event</span><span><i class="ol"></i>Has something you hearted</span><span>Weather from Open-Meteo, next 16 days</span></div>
+      <div class="legend"><span><i class="ol"></i>Has something you hearted</span><span>Forecast for DC from Open-Meteo, next 16 days</span></div>
     </div>
     <div class="chips" id="chips" role="group" aria-label="Filter by type"></div>
     <div class="status" id="status"></div>
@@ -191,7 +195,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
     </div>
     <nav class="months" id="months" aria-label="Months"></nav>
     <div class="grid" id="grid"></div>
-    <div class="legend"><span><i class="sw"></i>Darker = more going on</span><span><i class="dt"></i>One-night-only event</span><span><i class="ol"></i>Has something you hearted</span></div>
+    <div class="legend"><span><i class="ol"></i>Has something you hearted</span><span>Weather shows for the next 16 days</span></div>
   </dialog>
   <section id="anyView" hidden>
     <h3 class="sec">Any day</h3>
@@ -589,6 +593,7 @@ const clampStart=d=>d<RMIN?RMIN:d>addD(RMAX,-6)?addD(RMAX,-6):d;
 const inRange=TODAY>=RMIN&&TODAY<=RMAX;
 let start=clampStart(TODAY),selKey=inRange?iso(TODAY):null,WX={};
 const wxIcon=c=>c===0?"☀️":c<=2?"⛅":c===3?"☁️":c<=48?"🌫️":c<=57?"🌦️":c<=67?"🌧️":c<=77?"🌨️":c<=82?"🌧️":c<=86?"🌨️":"⛈️";
+const wxCls=c=>c===0?"wx-sun":c<=2?"wx-part":c===3?"wx-cloud":c<=48?"wx-fog":c<=67||(c>=80&&c<=82)?"wx-rain":c<=77||c<=86?"wx-snow":"wx-storm";
 const wxText=w=>`${wxIcon(w.c)} ${w.hi}°/${w.lo}°${w.pp>=30?`, ${w.pp}% chance of rain`:""}`;
 async function loadWx(){try{let c=null;try{c=JSON.parse(localStorage.getItem("dmvWx")||"null");}catch(e){}
   if(c&&Date.now()-c.t<3600e3)WX=c.d;else{const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude=38.9&longitude=-77.04&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&temperature_unit=fahrenheit&timezone=America%2FNew_York&forecast_days=16");const j=await r.json();WX={};j.daily.time.forEach((k,i)=>WX[k]={c:j.daily.weather_code[i],hi:Math.round(j.daily.temperature_2m_max[i]),lo:Math.round(j.daily.temperature_2m_min[i]),pp:j.daily.precipitation_probability_max[i]||0});try{localStorage.setItem("dmvWx",JSON.stringify({t:Date.now(),d:WX}));}catch(e){}}
@@ -596,7 +601,6 @@ async function loadWx(){try{let c=null;try{c=JSON.parse(localStorage.getItem("dm
 const val=(v,k)=> typeof v==="string"?v:(v[k]||(v.dow?v.dow[P(k).getDay()]:""));
 const priceStr=(it,k)=> typeof it.p==="string"?it.p:(k?val(it.p,k):(it.p.dow?(it.p.dow[1]===it.p.dow[5]?it.p.dow[1]:`Mon–Thu ${it.p.dow[1]}, Fri–Sat ${it.p.dow[5]}, Sun ${it.p.dow[0]}`):Object.values(it.p).join(" / ")));
 const timeStr=(it,k)=> typeof it.time==="string"?it.time:(k?val(it.time,k):(it.time.dow?"Mon–Thu "+it.time.dow[1]+"; Fri–Sat "+it.time.dow[5]+"; Sun "+it.time.dow[0]:Object.entries(it.time).map(([d,t])=>DOW[P(d).getDay()]+" "+t).join(", ")));
-const isSpecial=it=>it.days.length<=3;
 const isFree=it=>!it.est&&/^free/i.test(priceStr(it));
 const catOk=it=>cat==="all"||(cat==="free"?isFree(it):it.c===cat);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -629,10 +633,10 @@ function render(){
   document.getElementById("nextW").disabled=end>=RMAX;
   const inW=ITEMS.filter(it=>catOk(it)&&it.days.some(k=>keys.includes(k)));
   document.getElementById("total").textContent=`${inW.length} event${inW.length===1?"":"s"} this week`;
-  const cnt=keys.map(k=>inW.filter(it=>it.days.includes(k)).length),maxN=Math.max(1,...cnt);
-  document.getElementById("strip").innerHTML=keys.map((k,i)=>{const d=P(k),n=cnt[i],sp=inW.filter(it=>it.days.includes(k)&&isSpecial(it)).length;
-    const cls=["day","sday"];if(n)cls.push("has","h"+Math.ceil(4*n/maxN));if(+d===+TODAY)cls.push("today");if(d<TODAY)cls.push("past");if(ITEMS.some(it=>saved.has(it.id)&&it.days.includes(k)))cls.push("saved");
-    return `<button class="${cls.join(" ")}" data-k="${k}" aria-pressed="${selKey===k}" aria-label="${DOW[d.getDay()]} ${MN[d.getMonth()]} ${d.getDate()}: ${n} event${n===1?"":"s"}${sp?`, ${sp} one-night-only`:""}${cls.includes("saved")?", includes something you hearted":""}${WX[k]?", "+wxText(WX[k]):""}"><small>${DOW[d.getDay()]}</small><b>${d.getDate()}</b><span class="dots">${"<i></i>".repeat(Math.min(sp,3))}</span>${WX[k]?`<span class="wx">${wxIcon(WX[k].c)} ${WX[k].hi}°</span>`:""}</button>`;}).join("");
+  const cnt=keys.map(k=>inW.filter(it=>it.days.includes(k)).length);
+  document.getElementById("strip").innerHTML=keys.map((k,i)=>{const d=P(k),n=cnt[i],w=WX[k];
+    const cls=["day","sday"];if(w)cls.push(wxCls(w.c));if(+d===+TODAY)cls.push("today");if(d<TODAY)cls.push("past");if(ITEMS.some(it=>saved.has(it.id)&&it.days.includes(k)))cls.push("saved");
+    return `<button class="${cls.join(" ")}" data-k="${k}" aria-pressed="${selKey===k}" aria-label="${DOW[d.getDay()]} ${MN[d.getMonth()]} ${d.getDate()}: ${w?wxText(w)+", ":""}${n} event${n===1?"":"s"}${cls.includes("saved")?", includes something you hearted":""}"><small>${DOW[d.getDay()]}</small><b>${d.getDate()}</b>${w?`<span class="wxi" aria-hidden="true">${wxIcon(w.c)}</span><span class="hi">${w.hi}°</span><span class="lo">${w.lo}°</span>${w.pp>=30?`<span class="rain">💧${w.pp}%</span>`:""}`:`<span class="nofc">No forecast yet</span>`}</button>`;}).join("");
   const st=document.getElementById("status");let list,ctx;
   const todayBtn=inRange&&!keys.includes(iso(TODAY))?` <button id="goToday">Back to today</button>`:"";
   if(selKey&&keys.includes(selKey)){list=inW.filter(it=>it.days.includes(selKey));ctx={day:selKey};
@@ -654,11 +658,10 @@ function renderGrid(){
   const first=new Date(y,m,1).getDay(),nd=new Date(y,m+1,0).getDate();
   let g=["S","M","T","W","T","F","S"].map(d=>`<div class="dow" aria-hidden="true">${d}</div>`).join("");
   for(let i=0;i<first;i++)g+=`<div class="day empty"></div>`;
-  const maxN=Math.max(1,...Array.from({length:nd},(_,i)=>{const k=iso(new Date(y,m,i+1));return inM.filter(it=>it.days.includes(k)).length;}));
-  for(let d=1;d<=nd;d++){
-    const k=iso(new Date(y,m,d));const on=inM.filter(it=>it.days.includes(k));const n=on.length;const sp=on.filter(isSpecial).length;
-    const cls=["day"];if(n)cls.push("has","h"+Math.ceil(4*n/maxN));if(+new Date(y,m,d)===+TODAY)cls.push("today");if(new Date(y,m,d)<TODAY)cls.push("past");if(ITEMS.some(it=>saved.has(it.id)&&it.days.includes(k)))cls.push("saved");
-    g+=`<button class="${cls.join(" ")}" data-k="${k}" aria-pressed="${selKey===k}" aria-label="${MN[m]} ${d}: ${n} event${n===1?"":"s"}${sp?`, ${sp} one-night-only`:""}${cls.includes("saved")?", includes something you hearted":""}">${d}<span class="dots">${"<i></i>".repeat(Math.min(sp,3))}</span></button>`;
+    for(let d=1;d<=nd;d++){
+    const k=iso(new Date(y,m,d));const on=inM.filter(it=>it.days.includes(k));const n=on.length;const w=WX[k];
+    const cls=["day"];if(w)cls.push(wxCls(w.c));if(+new Date(y,m,d)===+TODAY)cls.push("today");if(new Date(y,m,d)<TODAY)cls.push("past");if(ITEMS.some(it=>saved.has(it.id)&&it.days.includes(k)))cls.push("saved");
+    g+=`<button class="${cls.join(" ")}" data-k="${k}" aria-pressed="${selKey===k}" aria-label="${MN[m]} ${d}: ${w?wxText(w)+", ":""}${n} event${n===1?"":"s"}${cls.includes("saved")?", includes something you hearted":""}">${d}${w?`<span class="mwx" aria-hidden="true">${wxIcon(w.c)}</span>`:""}</button>`;
   }
   document.getElementById("grid").innerHTML=g;
 }
