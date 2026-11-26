@@ -132,7 +132,10 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 .sday .temps{display:flex;justify-content:center;flex-wrap:wrap;gap:1px 5px;font-size:.92rem;font-weight:800;line-height:1.1}
 .sday .hi{color:#D45A1F}.sday .lo{color:#2F6FB0}
 .sday .rain{text-align:center;font-size:.72rem;font-weight:700;color:#2F6FB0;line-height:1.2;margin-top:1px}
-.sday .nofc{text-align:center;font-size:.7rem;color:var(--muted);margin-top:12px;line-height:1.2}
+.sday.nofx .top{flex:1;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.sday.nofx .dw{font-size:.85rem}
+.wrap .sday.nofx .dn,.sday.nofx .dn{font-size:2rem}
+@media (max-width:560px){.wrap .sday.nofx .dn{font-size:1.3rem}.sday.nofx .dw{font-size:.7rem}}
 .day.sday[aria-pressed="true"] .dw,.day.sday[aria-pressed="true"] .nofc{color:inherit;opacity:.8}
 .day.sday[aria-pressed="true"] .hi{color:#FFB27A}.day.sday[aria-pressed="true"] .lo,.day.sday[aria-pressed="true"] .rain{color:#9CCBFF}
 .wxsvg .spin{transform-box:fill-box;transform-origin:center;animation:wxspin 14s linear infinite}
@@ -985,8 +988,8 @@ function render(){
   document.getElementById("total").textContent=`${inW.length} event${inW.length===1?"":"s"} this week`;
   const cnt=keys.map(k=>inW.filter(it=>it.days.includes(k)).length);
   document.getElementById("strip").innerHTML=keys.map((k,i)=>{const d=P(k),n=cnt[i],w=WX[k];
-    const cls=["day","sday"];if(+d===+TODAY)cls.push("today");if(d<TODAY)cls.push("past");if(ITEMS.some(it=>it.days.includes(k)&&savedOn(it,k)))cls.push("saved");
-    return `<button class="${cls.join(" ")}" data-k="${k}" aria-pressed="${selKey===k}" aria-label="${DOW[d.getDay()]} ${MN[d.getMonth()]} ${d.getDate()}: ${w?wxText(w)+", ":""}${n} event${n===1?"":"s"}${cls.includes("saved")?", includes something you hearted":""}"><span class="top"><span class="dw"><span class="dwl">${DOW[d.getDay()]}</span><span class="dws">${DOW[d.getDay()].slice(0,2)}</span></span><span class="dn">${d.getDate()}</span></span>${w?`${wxSvg(w.c)}<span class="temps"><span class="hi">▲${w.hi}°</span><span class="lo">▼${w.lo}°</span></span>${w.pp>=30?`<span class="rain">💧${w.pp}%</span>`:""}`:`<span class="nofc">No forecast yet</span>`}</button>`;}).join("");
+    const cls=["day","sday"];if(!w)cls.push("nofx");if(+d===+TODAY)cls.push("today");if(d<TODAY)cls.push("past");if(ITEMS.some(it=>it.days.includes(k)&&savedOn(it,k)))cls.push("saved");
+    return `<button class="${cls.join(" ")}" data-k="${k}" aria-pressed="${selKey===k}" aria-label="${DOW[d.getDay()]} ${MN[d.getMonth()]} ${d.getDate()}: ${w?wxText(w)+", ":""}${n} event${n===1?"":"s"}${cls.includes("saved")?", includes something you hearted":""}"><span class="top"><span class="dw"><span class="dwl">${DOW[d.getDay()]}</span><span class="dws">${DOW[d.getDay()].slice(0,2)}</span></span><span class="dn">${d.getDate()}</span></span>${w?`${wxSvg(w.c)}<span class="temps"><span class="hi">▲${w.hi}°</span><span class="lo">▼${w.lo}°</span></span>${w.pp>=30?`<span class="rain">💧${w.pp}%</span>`:""}`:""}</button>`;}).join("");
   const st=document.getElementById("status");let list,ctx;
   const todayBtn=inRange&&!keys.includes(iso(TODAY))?` <button id="goToday">Back to today</button>`:"";
   if(selKey&&keys.includes(selKey)){list=inW.filter(it=>it.days.includes(selKey));ctx={day:selKey};
