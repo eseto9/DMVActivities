@@ -117,6 +117,8 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 .chipline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px}
 .time{font-size:.85rem;font-weight:600}
 .src{font-size:.78rem;color:var(--muted)}
+.txt{display:inline-flex;align-items:center;gap:6px;margin:2px 0 10px;padding:9px 16px;border-radius:999px;background:#2FA84F;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none}
+.txt:hover{filter:brightness(1.07)}
 .src a{color:var(--river)}
 .emptymonth{background:var(--surface);border:1px dashed var(--line);border-radius:16px;padding:18px;color:var(--muted);margin-top:14px}
 .mstat{align-self:flex-start;font-size:.78rem;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--river-soft);color:var(--river)}
@@ -982,6 +984,12 @@ const fmtD=k=>{const d=P(k);return `${DOW[d.getDay()]} ${MS[d.getMonth()]} ${d.g
 const weekKeys=()=>Array.from({length:7},(_,i)=>iso(addD(start,i)));
 const inWin=it=>{const ks=weekKeys();return it.days.filter(k=>ks.includes(k));};
 const fmtCrowd=n=>n>=1000?"~"+(n>=10000?Math.round(n/1000):Math.round(n/100)/10)+"k":"~"+n;
+function smsText(o){
+  const town=o.town&&o.w&&!o.w.toLowerCase().includes(o.town.split(",")[0].toLowerCase())?", "+o.town:"";
+  return [o.ask||"Want to go to this?","",o.t,
+    o.sdate?"📅 "+o.sdate:"",o.stime?"🕒 "+o.stime:"",o.sprice?"💵 "+o.sprice:"",
+    o.movie?"":o.w?"📍 "+o.w+town:(o.town?"📍 "+o.town:""),(o.snote||"").split(/(?<=[.!?])\s/)[0],o.u||""].filter((x,i)=>x||i===1).join("\n").replace(/\n{3,}/g,"\n\n");
+}
 function tile(o){
   if(!o.forceOpen)TILES[o.id]=o;
   const on=o.on!==undefined?o.on:saved.has(o.id),open=!!o.forceOpen;
@@ -993,7 +1001,7 @@ function tile(o){
       </span>
     </div>
     ${o.heart===false?"":`<button class="save" data-id="${o.id}"${o.day?` data-day="${o.day}"`:""}${o.multi?' data-multi="1"':""} aria-pressed="${on}" aria-label="${on?"Unheart":"Heart"} ${esc(o.t)}">${on?"♥":"♡"}</button>`}
-    <div class="tdetail"${open?"":" hidden"}>${o.town&&o.w?`<div class="addr">${esc(o.w)}</div>`:""}${o.when?`<span class="time">${esc(o.when)}</span>`:""}${o.hours&&o.hours!==o.time?`<div class="hours">🕒 ${esc(o.hours)}</div>`:""}${o.estNote?`<div class="est">Price not published; our guess</div>`:""}<p class="note">${esc(o.note||"")}</p>${o.u?`<div class="src">${o.srcPre||""} <a href="${o.u}" target="_blank" rel="noopener">${esc(o.src||"Details")}</a></div>`:""}</div>
+    <div class="tdetail"${open?"":" hidden"}>${o.town&&o.w?`<div class="addr">${esc(o.w)}</div>`:""}${o.when?`<span class="time">${esc(o.when)}</span>`:""}${o.hours&&o.hours!==o.time?`<div class="hours">🕒 ${esc(o.hours)}</div>`:""}${o.estNote?`<div class="est">Price not published; our guess</div>`:""}<p class="note">${esc(o.note||"")}</p>${o.sms?`<a class="txt" href="sms:?&body=${esc(encodeURIComponent(smsText(o)))}">💬 Text it</a>`:""}${o.u?`<div class="src">${o.srcPre||""} <a href="${o.u}" target="_blank" rel="noopener">${esc(o.src||"Details")}</a></div>`:""}</div>
   </article>`;
 }
 function card(it,ctx){
@@ -1001,7 +1009,8 @@ function card(it,ctx){
   const when=ctx.day?fmtD(k):(ds.length>=6?"Every day this week":ds.map(fmtD).join(", "));
   const wet=it.out&&(ctx.day?wetDay(k):ds.some(wetDay));
   const badge=(wet?`<span class="rainb" title="Outdoors and rain is in the forecast">☔ Rain likely</span>`:"")+(it.so?`<span class="sob" title="Usually sells out; book early">🎟 Sells out</span>`:"");
-  return tile({id:it.id,day:k,multi:it.days.length>1,badge,on:ctx.day?savedOn(it,ctx.day):savedAnyOf(it,ds),c:it.c,img:it.img,t:it.t,w:it.w,town:townOf(it),crowd:it.crowd,time:timeStr(it,k),hours:it.tfull||(typeof it.time=="string"?"":timeStr(it)),price:(it.est?"Est. ":"")+priceStr(it,k),priceCls:it.est?" est":isFree(it)?" free":"",estNote:it.est,when,note:it.n,u:it.u,src:it.s,srcPre:it.est?"Date and time via":"Confirmed via"});
+  const sdate=ctx.day?fmtD(k):(it.days.length>1?(ds.length>=6?"Every day this week":ds.map(fmtD).join(", "))+(it.days.length>ds.length?` (runs ${fmtD(it.days[0])} – ${fmtD(it.days[it.days.length-1])})`:""):fmtD(k));
+  return tile({id:it.id,day:k,multi:it.days.length>1,badge,sms:1,sdate,stime:timeStr(it,k),sprice:(it.est?"About ":"")+priceStr(it,k),snote:it.n,on:ctx.day?savedOn(it,ctx.day):savedAnyOf(it,ds),c:it.c,img:it.img,t:it.t,w:it.w,town:townOf(it),crowd:it.crowd,time:timeStr(it,k),hours:it.tfull||(typeof it.time=="string"?"":timeStr(it)),price:(it.est?"Est. ":"")+priceStr(it,k),priceCls:it.est?" est":isFree(it)?" free":"",estNote:it.est,when,note:it.n,u:it.u,src:it.s,srcPre:it.est?"Date and time via":"Confirmed via"});
 }
 function render(){
   const end=addD(start,6),keys=weekKeys(),sm=start.getMonth(),em=end.getMonth();
@@ -1055,10 +1064,10 @@ function renderGrid(){
   }
   document.getElementById("grid").innerHTML=g;
 }
-function anyCard(it){return tile({id:it.id,c:it.c,img:it.img,t:it.t,w:it.w,town:townOf(it),crowd:it.crowd,time:it.hrs?`Today ${it.hrs[TODAY.getDay()]}`:it.time,hours:it.time,price:it.p,priceCls:/^free/i.test(it.p)?" free":"",when:"Any day",note:it.n,u:it.u,src:it.s,srcPre:"Confirmed via"});}
+function anyCard(it){return tile({sms:1,sdate:"Any day"+(it.hrs?` (today ${it.hrs[TODAY.getDay()]})`:""),stime:it.time,sprice:it.p,snote:it.n,id:it.id,c:it.c,img:it.img,t:it.t,w:it.w,town:townOf(it),crowd:it.crowd,time:it.hrs?`Today ${it.hrs[TODAY.getDay()]}`:it.time,hours:it.time,price:it.p,priceCls:/^free/i.test(it.p)?" free":"",when:"Any day",note:it.n,u:it.u,src:it.s,srcPre:"Confirmed via"});}
 function renderAny(){const l=ANYTIME.filter(it=>areaOk(it)).filter(it=>acat==="all"||(acat==="free"?/^free/i.test(it.p):it.c===acat)).sort((a,b)=>(saved.has(b.id)-saved.has(a.id))||((b.crowd||0)-(a.crowd||0)));document.getElementById("anyList").innerHTML=l.length?l.map(anyCard).join(""):`<div class="emptymonth">Nothing in this category.</div>`;}
 function renderMovies(){const el=document.getElementById("movRow");if(!el)return;const today=iso(TODAY);const l=MOVIES.map((m,i)=>({...m,id:"mv"+i,i})).sort((a,b)=>(a.date>today)-(b.date>today)||(a.date>today?a.date.localeCompare(b.date):a.i-b.i));
-  el.innerHTML=l.length?l.map(m=>{const out=m.date<=today;const d=P(m.date);return tile({id:m.id,c:"culture",img:m.img,t:m.t,movie:true,heart:false,badge:`<span class="mstat${out?"":" soon"}">${out?"In theaters":"Opens "+MS[d.getMonth()]+" "+d.getDate()}</span>`,time:"",price:undefined,w:[m.genre,m.rating].filter(Boolean).join(" · "),time:m.leaves?(out?"Until about "+MS[P(m.leaves).getMonth()]+" "+P(m.leaves).getDate():""):"",when:(out?"In theaters since "+MS[d.getMonth()]+" "+d.getDate():"Opens "+fmtD(m.date))+(m.leaves?"; expected to leave theaters around "+fmtD(m.leaves)+(m.leavesNote?" ("+m.leavesNote+")":""):""),note:m.n,u:m.u,src:"Details"});}).join(""):`<div class="emptymonth">No movies listed yet.</div>`;}
+  el.innerHTML=l.length?l.map(m=>{const out=m.date<=today;const d=P(m.date);return tile({sms:1,ask:"Want to see this?",sdate:out?"In theaters now"+(m.leaves?", until about "+MS[P(m.leaves).getMonth()]+" "+P(m.leaves).getDate():""):"Opens "+fmtD(m.date),snote:[m.genre,m.rating].filter(Boolean).join(" · ")+(m.n?". "+m.n:""),id:m.id,c:"culture",img:m.img,t:m.t,movie:true,heart:false,badge:`<span class="mstat${out?"":" soon"}">${out?"In theaters":"Opens "+MS[d.getMonth()]+" "+d.getDate()}</span>`,time:"",price:undefined,w:[m.genre,m.rating].filter(Boolean).join(" · "),time:m.leaves?(out?"Until about "+MS[P(m.leaves).getMonth()]+" "+P(m.leaves).getDate():""):"",when:(out?"In theaters since "+MS[d.getMonth()]+" "+d.getDate():"Opens "+fmtD(m.date))+(m.leaves?"; expected to leave theaters around "+fmtD(m.leaves)+(m.leavesNote?" ("+m.leavesNote+")":""):""),note:m.n,u:m.u,src:"Details"});}).join(""):`<div class="emptymonth">No movies listed yet.</div>`;}
 document.getElementById("anyChips").innerHTML=ANYCATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===acat}">${l}</button>`).join("");
 document.getElementById("anyChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;acat=b.dataset.c;document.querySelectorAll("#anyChips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===acat));renderAny();});
 document.querySelector(".views").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;document.querySelectorAll(".views button").forEach(x=>{x.setAttribute("aria-pressed",x===b);document.getElementById(x.dataset.v).hidden=x!==b;});});
