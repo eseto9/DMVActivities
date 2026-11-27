@@ -48,6 +48,7 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .views button,.chips button{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);
   border-radius:999px;padding:8px 16px;cursor:pointer;font-size:.95rem}
 .views button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+@media (max-width:560px){.views{gap:5px;overflow-x:auto;scrollbar-width:none}.views::-webkit-scrollbar{display:none}.views button{padding:7px 10px;font-size:.84rem;white-space:nowrap;flex:0 0 auto}}
 .months{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}
 .months::-webkit-scrollbar{display:none}
 .months button{flex:0 0 auto;font:inherit;font-size:.9rem;border:0;background:transparent;color:var(--muted);padding:6px 10px;border-radius:10px;cursor:pointer}
@@ -86,10 +87,10 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .sday.today::before{content:"Today";position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#E8742C;color:#fff;font-size:.6rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:999px;white-space:nowrap;z-index:2;line-height:1.3}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin:20px 0 6px}
 .chips button{padding:6px 13px;font-size:.88rem}
-.chips.areas{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 0 12px;padding-bottom:2px}
-.chips.areas::-webkit-scrollbar{display:none}
-.chips.areas button{flex:0 0 auto}
-.chips.areas button[aria-pressed="true"]{background:var(--river);border-color:var(--river);color:#fff}
+.areas{position:relative;display:inline-flex;align-items:center;margin:0 0 12px;max-width:100%}
+.areas label{position:absolute;left:14px;pointer-events:none;font-size:1rem}
+.areas select{font:inherit;font-size:1rem;font-weight:600;color:var(--ink);background-color:var(--surface);border:1px solid var(--line);border-radius:999px;padding:9px 40px;max-width:100%;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.areas.on select{background-color:var(--river);border-color:var(--river);color:#fff}
 .bigwrap h3.sec{margin:22px 0 8px}
 .bigs{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;scrollbar-width:thin}
 .bigcard{flex:0 0 172px;scroll-snap-align:start;display:flex;flex-direction:column;gap:3px;text-align:left;font:inherit;color:inherit;background:var(--surface);border:2px solid var(--gold);border-radius:16px;overflow:hidden;padding:0 0 10px;cursor:pointer}
@@ -227,14 +228,15 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 <div class="wrap">
   <header>
     <h1>Date nights in the DMV</h1>
-    <p>Every event here has a confirmed date, time and price, checked against the organizer or an official listing. Swipe the week or tap a date to see what’s on, open the full month to jump ahead, and tap any card for the details. Any day lists places that don’t need a date; Movies shows what’s playing. Each day shows its forecast. Heart the ones you want: they jump to the top and their days get a little heart.</p>
+    <p>Every event here has a confirmed date, time and price, checked against the organizer or an official listing. Swipe the week or tap a date to see what’s on, open the full month to jump ahead, and tap any card for the details. Any day lists places that don’t need a date; Restaurants shows new openings; Movies shows what’s playing. Each day shows its forecast. Heart the ones you want: they jump to the top and their days get a little heart.</p>
   </header>
   <div class="views" role="group" aria-label="View">
     <button id="vCal" data-v="calView" aria-pressed="true">Calendar</button>
     <button id="vAny" data-v="anyView" aria-pressed="false">Any day</button>
+    <button id="vRest" data-v="restView" aria-pressed="false">Restaurants</button>
     <button id="vMov" data-v="movView" aria-pressed="false">Movies</button>
   </div>
-  <div class="chips areas" id="areas" role="group" aria-label="Filter by area"></div>
+  <div class="areas" id="areas"><label for="areaSel">📍</label><select id="areaSel" aria-label="Filter by area"></select></div>
   <section id="calView">
     <div class="cal">
       <div class="banner" id="banner" aria-hidden="true"></div>
@@ -270,6 +272,12 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
     <p class="status">No date needed. Open most days, with hours and prices checked. Sorted by about how many people visit on a typical day. Tap a card for details. Heart one and it stays at the top.</p>
     <div class="chips" id="anyChips" role="group" aria-label="Filter any-day ideas"></div>
     <div class="list" id="anyList"></div>
+  </section>
+  <section id="restView" hidden>
+    <h3 class="sec">Restaurants</h3>
+    <p class="status">New restaurants around the DMV: what's opening soon, with the opening date once it's announced, and what just opened. Tap a card for details.</p>
+    <div class="chips" id="restChips" role="group" aria-label="Filter restaurants"></div>
+    <div id="restLists"></div>
   </section>
   <section id="movView" hidden>
     <h3 class="sec">Movies</h3>
@@ -906,6 +914,10 @@ TH.class=["#E8E0FA","#B9A5F0",`<rect x="16" y="14" width="32" height="36" rx="4"
 TH.volunteer=["#DCEFD8","#8CC98A",`<path d="M32 50 C14 38 10 28 16 21 c5 -6 13 -4 16 2 c3 -6 11 -8 16 -2 c6 7 2 17 -16 29z" fill="#fff"/><path d="M20 44 q12 -6 24 0" stroke="#4E8F4C" stroke-width="2" fill="none"/>`];
 function thumb(it){ const [a,b,ic]=TH[it.c]||TH.culture; const g="g"+it.id.replace(/[^a-z0-9]/gi,""); const im=it.img?`<img class="tbg" src="${esc(it.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"><img class="tfg" src="${esc(it.img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.previousElementSibling&&this.previousElementSibling.remove();this.remove()">`:""; return `<div class="thumb" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="64" height="64" fill="url(#${g})"/>${ic}</svg>${im}</div>`; }
 
+const RESTCATS=[["all","All"],["soon","Opening soon"],["new","Just opened"]];
+let rcat="all";
+const RESTAURANTS=[
+];
 const ANYCATS=[["all","All"],["active","Active"],["food","Food & markets"],["culture","Culture"],["scenic","Scenic"],["free","Free"]];
 let acat="all";
 const CATS=[["all","All"],["food","Food & drink"],["sports","Wizards & Caps"],["volunteer","Volunteer"],["holiday","Holiday & lights"],["culture","Culture"],["class","Classes"],["outdoors","Outdoors"],["free","Free"]];
@@ -1038,7 +1050,7 @@ function render(){
   document.getElementById("list").innerHTML=list.length?list.map(it=>card(it,ctx)).join(""):`<div class="emptymonth">${ctx.day?"Nothing confirmed for this day yet.":"Nothing confirmed for these days and this filter yet."}</div>`;
   if(document.getElementById("calDlg").open)renderGrid();
   placePanel();
-  renderBig();renderAny();renderMovies();
+  renderBig();renderAny();renderRest();renderMovies();
 }
 function renderBig(){
   const today=iso(TODAY),lim=iso(RMAX);
@@ -1065,15 +1077,30 @@ function renderGrid(){
   document.getElementById("grid").innerHTML=g;
 }
 function anyCard(it){return tile({sms:1,sdate:"Any day"+(it.hrs?` (today ${it.hrs[TODAY.getDay()]})`:""),stime:it.time,sprice:it.p,snote:it.n,id:it.id,c:it.c,img:it.img,t:it.t,w:it.w,town:townOf(it),crowd:it.crowd,time:it.hrs?`Today ${it.hrs[TODAY.getDay()]}`:it.time,hours:it.time,price:it.p,priceCls:/^free/i.test(it.p)?" free":"",when:"Any day",note:it.n,u:it.u,src:it.s,srcPre:"Confirmed via"});}
+function restCard(r){
+  const town=townOf(r),badge=`<span class="mstat${r.status==="new"?"":" soon"}">${esc(r.cuisine||"Restaurant")}</span>`;
+  return tile({id:r.id,c:"food",img:r.img,t:r.name,w:r.w,town,badge,time:r.when,price:r.p,priceCls:"",when:r.when+(r.hours?" · "+r.hours:""),note:r.n,u:r.u,src:r.s,srcPre:"Via",
+    sms:1,ask:r.status==="new"?"Want to try this new place?":"Want to try this when it opens?",sdate:r.when,stime:r.hours||"",sprice:r.p,snote:(r.cuisine?r.cuisine+". ":"")+(r.n||"")});
+}
+function renderRest(){
+  const el=document.getElementById("restLists");if(!el)return;const today=iso(TODAY);
+  const l=RESTAURANTS.filter(r=>areaOk(r)).map(r=>r.status==="dated"&&r.date&&r.date<today?{...r,status:"new",when:"Opened "+fmtD(r.date)}:r);
+  const soon=l.filter(r=>r.status!=="new").sort((a,b)=>(saved.has(b.id)-saved.has(a.id))||((a.date?0:1)-(b.date?0:1))||(a.date||"").localeCompare(b.date||"")||a.name.localeCompare(b.name));
+  const fresh=l.filter(r=>r.status==="new").sort((a,b)=>(saved.has(b.id)-saved.has(a.id))||(b.date||"").localeCompare(a.date||""));
+  const sec=(title,arr)=>`<h3 class="sec">${title}</h3>`+(arr.length?`<div class="list">${arr.map(restCard).join("")}</div>`:`<div class="emptymonth">Nothing here for this area yet.</div>`);
+  el.innerHTML=(rcat!=="new"?sec("Opening soon",soon):"")+(rcat!=="soon"?sec("Just opened",fresh):"");
+}
 function renderAny(){const l=ANYTIME.filter(it=>areaOk(it)).filter(it=>acat==="all"||(acat==="free"?/^free/i.test(it.p):it.c===acat)).sort((a,b)=>(saved.has(b.id)-saved.has(a.id))||((b.crowd||0)-(a.crowd||0)));document.getElementById("anyList").innerHTML=l.length?l.map(anyCard).join(""):`<div class="emptymonth">Nothing in this category.</div>`;}
 function renderMovies(){const el=document.getElementById("movRow");if(!el)return;const today=iso(TODAY);const l=MOVIES.map((m,i)=>({...m,id:"mv"+i,i})).sort((a,b)=>(a.date>today)-(b.date>today)||(a.date>today?a.date.localeCompare(b.date):a.i-b.i));
   el.innerHTML=l.length?l.map(m=>{const out=m.date<=today;const d=P(m.date);return tile({sms:1,ask:"Want to see this?",sdate:out?"In theaters now"+(m.leaves?", until about "+MS[P(m.leaves).getMonth()]+" "+P(m.leaves).getDate():""):"Opens "+fmtD(m.date),snote:[m.genre,m.rating].filter(Boolean).join(" · ")+(m.n?". "+m.n:""),id:m.id,c:"culture",img:m.img,t:m.t,movie:true,heart:false,badge:`<span class="mstat${out?"":" soon"}">${out?"In theaters":"Opens "+MS[d.getMonth()]+" "+d.getDate()}</span>`,time:"",price:undefined,w:[m.genre,m.rating].filter(Boolean).join(" · "),time:m.leaves?(out?"Until about "+MS[P(m.leaves).getMonth()]+" "+P(m.leaves).getDate():""):"",when:(out?"In theaters since "+MS[d.getMonth()]+" "+d.getDate():"Opens "+fmtD(m.date))+(m.leaves?"; expected to leave theaters around "+fmtD(m.leaves)+(m.leavesNote?" ("+m.leavesNote+")":""):""),note:m.n,u:m.u,src:"Details"});}).join(""):`<div class="emptymonth">No movies listed yet.</div>`;}
 document.getElementById("anyChips").innerHTML=ANYCATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===acat}">${l}</button>`).join("");
+document.getElementById("restChips").innerHTML=RESTCATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===rcat}">${l}</button>`).join("");
+document.getElementById("restChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;rcat=b.dataset.c;document.querySelectorAll("#restChips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===rcat));renderRest();});
 document.getElementById("anyChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;acat=b.dataset.c;document.querySelectorAll("#anyChips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===acat));renderAny();});
 document.querySelector(".views").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;document.querySelectorAll(".views button").forEach(x=>{x.setAttribute("aria-pressed",x===b);document.getElementById(x.dataset.v).hidden=x!==b;});});
-function renderAreas(){document.getElementById("areas").innerHTML=AREAS.map(([k,l])=>`<button data-a="${k}" aria-pressed="${k===area}">${k==="all"?"📍 ":""}${l}</button>`).join("");}
+function renderAreas(){const sel=document.getElementById("areaSel");sel.innerHTML=AREAS.map(([k,l])=>`<option value="${k}"${k===area?" selected":""}>${l}</option>`).join("");document.getElementById("areas").classList.toggle("on",area!=="all");}
 renderAreas();
-document.getElementById("areas").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;area=b.dataset.a;try{localStorage.setItem("dmvArea",area);}catch(x){}renderAreas();render();});
+document.getElementById("areaSel").addEventListener("change",e=>{area=e.target.value;try{localStorage.setItem("dmvArea",area);}catch(x){}renderAreas();render();});
 document.getElementById("bigs").addEventListener("click",e=>{const b=e.target.closest(".bigcard");if(!b)return;selKey=b.dataset.k;start=clampStart(P(selKey));openId=b.dataset.id;render();const d=document.querySelector(".dpanel");if(d)d.scrollIntoView({block:"center",behavior:"smooth"});});
 document.getElementById("chips").innerHTML=CATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===cat}">${l}</button>`).join("");
 document.getElementById("chips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.c;document.querySelectorAll("#chips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===cat));render();});
