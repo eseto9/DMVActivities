@@ -90,6 +90,10 @@ header p{margin:0;color:var(--muted);max-width:34em}
 .areas{position:relative;display:inline-flex;align-items:center;margin:0 0 12px;max-width:100%}
 .areas label{position:absolute;left:14px;pointer-events:none;font-size:1rem}
 .areas select{font:inherit;font-size:1rem;font-weight:600;color:var(--ink);background-color:var(--surface);border:1px solid var(--line);border-radius:999px;padding:9px 40px;max-width:100%;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.chips .areas{margin:0}
+.chips .areas label{left:11px;font-size:.85rem}
+.chips .areas select{font-size:.88rem;padding:6px 30px 6px 30px;background-position:right 10px center}
+.areas[hidden]{display:none}
 .areas.on select{background-color:var(--river);border-color:var(--river);color:#fff}
 .bigwrap h3.sec{margin:22px 0 8px}
 .bigs{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;scrollbar-width:thin}
@@ -1203,13 +1207,15 @@ document.getElementById("anyChips").innerHTML=ANYCATS.map(([k,l])=>`<button data
 document.getElementById("restChips").innerHTML=RESTCATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===rcat}">${l}</button>`).join("");
 document.getElementById("restChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;rcat=b.dataset.c;document.querySelectorAll("#restChips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===rcat));renderRest();});
 document.getElementById("anyChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;acat=b.dataset.c;document.querySelectorAll("#anyChips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===acat));renderAny();});
-document.querySelector(".views").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;document.querySelectorAll(".views button").forEach(x=>{x.setAttribute("aria-pressed",x===b);document.getElementById(x.dataset.v).hidden=x!==b;});});
+function placeAreas(v){const host={calView:"chips",anyView:"anyChips",restView:"restChips"}[v],a=document.getElementById("areas");a.hidden=!host;if(host)document.getElementById(host).prepend(a);}
+document.querySelector(".views").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;placeAreas(b.dataset.v);document.querySelectorAll(".views button").forEach(x=>{x.setAttribute("aria-pressed",x===b);document.getElementById(x.dataset.v).hidden=x!==b;});});
 function renderAreas(){const sel=document.getElementById("areaSel");sel.innerHTML=AREAS.map(([k,l])=>`<option value="${k}"${k===area?" selected":""}>${l}</option>`).join("");document.getElementById("areas").classList.toggle("on",area!=="all");}
 renderAreas();
 document.getElementById("areaSel").addEventListener("change",e=>{area=e.target.value;selKey=null;openId=null;try{localStorage.setItem("dmvArea",area);}catch(x){}renderAreas();render();});
 document.getElementById("bigs").addEventListener("click",e=>{const b=e.target.closest(".bigcard");if(!b)return;selKey=b.dataset.k;start=clampStart(P(selKey));openId=b.dataset.id;render();const d=document.querySelector(".dpanel");if(d)d.scrollIntoView({block:"center",behavior:"smooth"});});
 document.getElementById("chips").innerHTML=CATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===cat}">${l}</button>`).join("");
 document.getElementById("chips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.c;document.querySelectorAll("#chips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===cat));render();});
+placeAreas("calView");
 const shiftWeek=n=>{const ns=clampStart(addD(start,n));if(+ns===+start)return;start=ns;selKey=null;render();};
 document.getElementById("prevW").onclick=()=>shiftWeek(-7);
 document.getElementById("nextW").onclick=()=>shiftWeek(7);
