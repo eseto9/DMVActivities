@@ -197,6 +197,23 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 .mstat{font-size:.74rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--river-soft);color:var(--river)}
 .mstat.soon{background:var(--blossom-soft);color:var(--blossom)}
 .tile.movie .tbody{gap:4px}
+/* phone: compact list, one event per row */
+@media (max-width:560px){
+.list{grid-template-columns:1fr;gap:8px}
+.tile:not(.open){border-radius:14px}
+.tile:not(.open) .topen{flex-direction:row;align-items:stretch}
+.tile:not(.open) .thumb{flex:0 0 112px;width:112px;aspect-ratio:auto;min-height:84px;align-self:stretch}
+.tile.movie:not(.open) .thumb{flex-basis:64px;width:64px;min-height:96px}
+.tile:not(.open) .tbody{flex:1;min-width:0;justify-content:center;gap:2px;padding:7px 44px 7px 11px}
+.tile:not(.open) .t4{font-size:.95rem;line-height:1.2}
+.tile:not(.open) .where{font-size:.78rem}
+.tile:not(.open) .tmeta{gap:2px 6px;margin-top:1px}
+.tile:not(.open) .tmeta .time,.tile:not(.open) .tmeta .crowd{font-size:.74rem}
+.tile:not(.open) .tmeta .price{font-size:.72rem;padding:1px 7px}
+.tile:not(.open) .save{width:32px;height:32px}
+.tile:not(.open) .save{top:50%;transform:translateY(-50%);right:8px}
+.tile.active{outline-offset:-3px}
+}
 </style>
 </head>
 <body>
