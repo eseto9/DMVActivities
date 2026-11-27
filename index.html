@@ -121,6 +121,9 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 .txt{display:inline-flex;align-items:center;gap:6px;margin:2px 0 10px;padding:9px 16px;border-radius:999px;background:#2FA84F;color:#fff;font-weight:700;font-size:.92rem;text-decoration:none}
 .txt:hover{filter:brightness(1.07)}
 .src a{color:var(--river)}
+#list:has(.areaall){display:block}
+.areaall .sec.asec{margin:18px 0 10px}.areaall .sec.asec:first-child{margin-top:4px}
+.areaall .sec small{font-weight:600;color:var(--muted);font-size:.8em}
 .emptymonth{background:var(--surface);border:1px dashed var(--line);border-radius:16px;padding:18px;color:var(--muted);margin-top:14px}
 .mstat{align-self:flex-start;font-size:.78rem;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--river-soft);color:var(--river)}
 .mstat.soon{background:var(--blossom-soft);color:var(--blossom)}
@@ -1076,10 +1079,13 @@ const areasOf=it=>{const t=townOf(it);if(t==="MD, VA & DC"||t==="Around DC"||t==
   for(const [a,ts] of Object.entries(AREA_TOWNS))if(ts.some(x=>t.startsWith(x+",")||t.includes(" & "+x+",")||t.startsWith(x+" &")))out.push(a);
   return out.length?out:["other"];};
 let area="all";try{area=localStorage.getItem("dmvArea")||"all";}catch(e){}
+if(area!=="all")selKey=null;
 const areaOk=it=>area==="all"||(()=>{const a=areasOf(it);return a.includes("*")||a.includes(area);})();
 const fmtD=k=>{const d=P(k);return `${DOW[d.getDay()]} ${MS[d.getMonth()]} ${d.getDate()}`;};
 const weekKeys=()=>Array.from({length:7},(_,i)=>iso(addD(start,i)));
 const inWin=it=>{const ks=weekKeys();return it.days.filter(k=>ks.includes(k));};
+const upDays=it=>{const t=iso(TODAY);return it.days.filter(k=>k>=t);};
+const totalPpl=it=>it.id==="cheapmovietue"?0:(it.crowd||0)*Math.max(1,upDays(it).length);
 const fmtCrowd=n=>n>=1000?"~"+(n>=10000?Math.round(n/1000):Math.round(n/100)/10)+"k":"~"+n;
 function smsText(o){
   const town=o.town&&o.w&&!o.w.toLowerCase().includes(o.town.split(",")[0].toLowerCase())?", "+o.town:"";
@@ -1094,7 +1100,7 @@ function tile(o){
     <div class="topen" role="button" tabindex="0" data-open="${o.id}" aria-expanded="${openId===o.id}" aria-label="${esc(o.t)}, show details">
       ${thumb({img:o.img,c:o.c||"culture",id:o.id})}
       <span class="tbody"><span class="t4">${esc(o.t)}</span>${o.town||o.w?`<span class="where">${o.town?"📍 ":""}${esc(o.town||o.w)}</span>`:""}
-        <span class="tmeta">${o.badge||""}${o.crowd&&o.id!=="cheapmovietue"?`<span class="crowd" title="Estimated people going">👥 ${fmtCrowd(o.crowd)}</span>`:""}${o.time?`<span class="time">🕒 ${esc(o.time)}</span>`:""}${o.price!==undefined?`<span class="price${o.priceCls||""}">${esc(o.price)}</span>`:""}</span>
+        <span class="tmeta">${o.badge||""}${o.crowd&&o.id!=="cheapmovietue"?`<span class="crowd" title="${o.crowdT||"Estimated people going"}">👥 ${fmtCrowd(o.crowd)}</span>`:""}${o.time?`<span class="time">🕒 ${esc(o.time)}</span>`:""}${o.price!==undefined?`<span class="price${o.priceCls||""}">${esc(o.price)}</span>`:""}</span>
       </span>
     </div>
     ${o.heart===false?"":`<button class="save" data-id="${o.id}"${o.day?` data-day="${o.day}"`:""}${o.multi?' data-multi="1"':""} aria-pressed="${on}" aria-label="${on?"Unheart":"Heart"} ${esc(o.t)}">${on?"♥":"♡"}</button>`}
@@ -1102,12 +1108,13 @@ function tile(o){
   </article>`;
 }
 function card(it,ctx){
-  const ds=inWin(it);const k=ctx.day||ds[0]||it.days[0];
-  const when=ctx.day?fmtD(k):(ds.length>=6?"Every day this week":ds.map(fmtD).join(", "));
-  const wet=it.out&&(ctx.day?wetDay(k):ds.some(wetDay));
+  const ds=ctx.all?upDays(it):inWin(it);const k=ctx.day||ds[0]||it.days[0];
+  const span=ds.length>1?`${ds.length} dates, ${fmtD(ds[0])} – ${fmtD(ds[ds.length-1])}`:fmtD(k);
+  const when=ctx.day?fmtD(k):ctx.all?span:(ds.length>=6?"Every day this week":ds.map(fmtD).join(", "));
+  const wet=it.out&&(ctx.day?wetDay(k):ctx.all?wetDay(k):ds.some(wetDay));
   const badge=(wet?`<span class="rainb" title="Outdoors and rain is in the forecast">☔ Rain likely</span>`:"")+(it.so?`<span class="sob" title="Usually sells out; book early">🎟 Sells out</span>`:"");
-  const sdate=ctx.day?fmtD(k):(it.days.length>1?(ds.length>=6?"Every day this week":ds.map(fmtD).join(", "))+(it.days.length>ds.length?` (runs ${fmtD(it.days[0])} – ${fmtD(it.days[it.days.length-1])})`:""):fmtD(k));
-  return tile({id:it.id,day:k,multi:it.days.length>1,badge,sms:1,sdate,stime:timeStr(it,k),sprice:(it.est?"About ":"")+priceStr(it,k),snote:it.n,on:ctx.day?savedOn(it,ctx.day):savedAnyOf(it,ds),c:it.c,img:it.img,t:it.t,w:it.w,town:townOf(it),crowd:it.crowd,time:timeStr(it,k),hours:it.tfull||(typeof it.time=="string"?"":timeStr(it)),price:(it.est?"Est. ":"")+priceStr(it,k),priceCls:it.est?" est":isFree(it)?" free":"",estNote:it.est,when,note:it.n,u:it.u,src:it.s,srcPre:it.est?"Date and time via":"Confirmed via"});
+  const sdate=ctx.day?fmtD(k):ctx.all?span:(it.days.length>1?(ds.length>=6?"Every day this week":ds.map(fmtD).join(", "))+(it.days.length>ds.length?` (runs ${fmtD(it.days[0])} – ${fmtD(it.days[it.days.length-1])})`:""):fmtD(k));
+  return tile({id:it.id,day:k,multi:it.days.length>1,badge,sms:1,sdate,stime:timeStr(it,k),sprice:(it.est?"About ":"")+priceStr(it,k),snote:it.n,on:ctx.day?savedOn(it,ctx.day):savedAnyOf(it,ds),c:it.c,img:it.img,t:it.t,w:it.w,town:townOf(it),crowd:ctx.all?totalPpl(it):it.crowd,crowdT:ctx.all&&ds.length>1?"Estimated people in total across all dates":"",time:timeStr(it,k),hours:it.tfull||(typeof it.time=="string"?"":timeStr(it)),price:(it.est?"Est. ":"")+priceStr(it,k),priceCls:it.est?" est":isFree(it)?" free":"",estNote:it.est,when,note:it.n,u:it.u,src:it.s,srcPre:it.est?"Date and time via":"Confirmed via"});
 }
 function render(){
   const end=addD(start,6),keys=weekKeys(),sm=start.getMonth(),em=end.getMonth();
@@ -1126,16 +1133,29 @@ function render(){
   const st=document.getElementById("status");let list,ctx;
   const todayBtn=inRange&&!keys.includes(iso(TODAY))?` <button id="goToday">Back to today</button>`:"";
   if(selKey&&keys.includes(selKey)){list=inW.filter(it=>it.days.includes(selKey));ctx={day:selKey};
-    st.innerHTML=`${list.length} event${list.length===1?"":"s"} on ${fmtD(selKey)}${WX[selKey]?" · "+wxText(WX[selKey]):""}. <button id="clearDay">Show all 7 days</button>${todayBtn}`;}
+    st.innerHTML=`${list.length} event${list.length===1?"":"s"} on ${fmtD(selKey)}${WX[selKey]?" · "+wxText(WX[selKey]):""}. <button id="clearDay">${area!=="all"?"Show every date":"Show all 7 days"}</button>${todayBtn}`;}
+  else if(area!=="all"){list=ITEMS.filter(it=>catOk(it)&&upDays(it).length);ctx={all:1};
+    const an=AREAS.find(a=>a[0]===area)[1];
+    st.innerHTML=`Everything in ${esc(an)}, every date through ${MS[RMAX.getMonth()]} ${RMAX.getDate()}: ${list.length} event${list.length===1?"":"s"}, each listed once. Biggest crowds first (people across all its dates). Tap a date above to see just that day.`;}
   else{list=inW;ctx={};st.innerHTML=`Everything ${MS[sm]} ${start.getDate()} – ${MS[em]} ${end.getDate()}. Tap a date to narrow it.${todayBtn}`;}
   const tuePin=ctx.day&&P(ctx.day).getDay()===2;
   const hk=it=>ctx.day?savedOn(it,ctx.day):savedAnyOf(it,inWin(it));
   const wetSel=ctx.day&&wetDay(ctx.day);
-  list.sort((a,b)=>(hk(b)-hk(a))||(tuePin?((b.id==="cheapmovietue")-(a.id==="cheapmovietue")):0)||(wetSel?((a.out?1:0)-(b.out?1:0)):0)||((b.crowd||0)-(a.crowd||0))||inWin(a)[0].localeCompare(inWin(b)[0]));
-  document.getElementById("list").innerHTML=list.length?list.map(it=>card(it,ctx)).join(""):`<div class="emptymonth">${ctx.day?"Nothing confirmed for this day yet.":"Nothing confirmed for these days and this filter yet."}</div>`;
+  if(ctx.all)list.sort((a,b)=>(savedAnyOf(b,upDays(b))-savedAnyOf(a,upDays(a)))||(totalPpl(b)-totalPpl(a))||upDays(a)[0].localeCompare(upDays(b)[0]));
+  else list.sort((a,b)=>(hk(b)-hk(a))||(tuePin?((b.id==="cheapmovietue")-(a.id==="cheapmovietue")):0)||(wetSel?((a.out?1:0)-(b.out?1:0)):0)||((b.crowd||0)-(a.crowd||0))||inWin(a)[0].localeCompare(inWin(b)[0]));
+  document.getElementById("list").innerHTML=ctx.all?areaAll(list,ctx):list.length?list.map(it=>card(it,ctx)).join(""):`<div class="emptymonth">${ctx.day?"Nothing confirmed for this day yet.":"Nothing confirmed for these days and this filter yet."}</div>`;
   if(document.getElementById("calDlg").open)renderGrid();
   placePanel();
   renderBig();renderAny();renderRest();renderMovies();
+}
+function areaAll(list,ctx){
+  const any=ANYTIME.filter(it=>areaOk(it)&&(cat==="all"||(cat==="free"?/^free/i.test(it.p):it.c===cat))).sort((a,b)=>(saved.has(b.id)-saved.has(a.id))||((b.crowd||0)-(a.crowd||0)));
+  const today=iso(TODAY),cut=iso(addD(TODAY,-61));
+  const rs=cat==="all"||cat==="food"?RESTAURANTS.filter(r=>areaOk(r)).map(r=>r.status==="dated"&&r.date&&r.date<today?{...r,status:"new",when:"Opened "+fmtD(r.date)}:r).filter(r=>r.status!=="new"||!r.date||r.date>=cut).sort((a,b)=>(saved.has(b.id)-saved.has(a.id))||((a.status==="new"?0:1)-(b.status==="new"?0:1))||(a.date||a.sk||"9").localeCompare(b.date||b.sk||"9")||a.name.localeCompare(b.name)):[];
+  const sec=(t,n,html)=>`<h3 class="sec asec">${t} <small>${n}</small></h3>`+(n?html:`<div class="emptymonth">Nothing here for this area and filter yet.</div>`);
+  return `<div class="areaall">`+sec("Events",list.length,`<div class="list">${list.map(it=>card(it,ctx)).join("")}</div>`)
+    +sec("Any day",any.length,`<div class="list">${any.map(anyCard).join("")}</div>`)
+    +(rs.length||cat==="food"?sec("New restaurants",rs.length,`<div class="list">${rs.map(restCard).join("")}</div>`):"")+`</div>`;
 }
 function renderBig(){
   const today=iso(TODAY),lim=iso(RMAX);
@@ -1186,7 +1206,7 @@ document.getElementById("anyChips").addEventListener("click",e=>{const b=e.targe
 document.querySelector(".views").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;document.querySelectorAll(".views button").forEach(x=>{x.setAttribute("aria-pressed",x===b);document.getElementById(x.dataset.v).hidden=x!==b;});});
 function renderAreas(){const sel=document.getElementById("areaSel");sel.innerHTML=AREAS.map(([k,l])=>`<option value="${k}"${k===area?" selected":""}>${l}</option>`).join("");document.getElementById("areas").classList.toggle("on",area!=="all");}
 renderAreas();
-document.getElementById("areaSel").addEventListener("change",e=>{area=e.target.value;try{localStorage.setItem("dmvArea",area);}catch(x){}renderAreas();render();});
+document.getElementById("areaSel").addEventListener("change",e=>{area=e.target.value;selKey=null;openId=null;try{localStorage.setItem("dmvArea",area);}catch(x){}renderAreas();render();});
 document.getElementById("bigs").addEventListener("click",e=>{const b=e.target.closest(".bigcard");if(!b)return;selKey=b.dataset.k;start=clampStart(P(selKey));openId=b.dataset.id;render();const d=document.querySelector(".dpanel");if(d)d.scrollIntoView({block:"center",behavior:"smooth"});});
 document.getElementById("chips").innerHTML=CATS.map(([k,l])=>`<button data-c="${k}" aria-pressed="${k===cat}">${l}</button>`).join("");
 document.getElementById("chips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.c;document.querySelectorAll("#chips button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===cat));render();});
