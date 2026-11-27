@@ -129,7 +129,7 @@ button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offse
 .sday .dw{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.02em;color:var(--muted)}
 .sday .dn{font-size:1.15rem;font-weight:800}
 .sday .dws{display:none}
-@media (max-width:560px){.cal{padding-left:12px;padding-right:12px}.banner{width:calc(100% + 24px);margin-left:-12px;margin-right:-12px}.strip{display:flex;overflow-x:auto;scroll-snap-type:x proximity;gap:8px;scrollbar-width:none;margin:0 -12px;padding:10px 12px 4px;scroll-padding-left:12px}.strip::-webkit-scrollbar{display:none}.day.sday{flex:0 0 calc((100% - 24px)/3.5);scroll-snap-align:start;padding:7px 8px 8px}.sday .dw{font-size:.8rem}.sday .dn{font-size:1.4rem}.sday .wxsvg{height:58px}.sday .temps{font-size:1.02rem}.sday .rain{font-size:.82rem}}
+@media (max-width:560px){.cal{padding-left:12px;padding-right:12px}.banner{width:calc(100% + 24px);margin-left:-12px;margin-right:-12px}.strip{display:flex;overflow-x:auto;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-snap-type:x proximity;gap:8px;scrollbar-width:none;margin:0 -12px;padding:10px 12px 4px;scroll-padding-left:12px}.strip::-webkit-scrollbar{display:none}.day.sday{flex:0 0 calc((100% - 24px)/3.5);scroll-snap-align:start;padding:7px 8px 8px}.sday .dw{font-size:.8rem}.sday .dn{font-size:1.4rem}.sday .wxsvg{height:58px}.sday .temps{font-size:1.02rem}.sday .rain{font-size:.82rem}}
 .sday .wxsvg{display:block;width:100%;height:44px;margin:4px 0 2px;overflow:visible}
 .sday .temps{display:flex;justify-content:center;flex-wrap:wrap;gap:1px 5px;font-size:.92rem;font-weight:800;line-height:1.1}
 .sday .hi{color:#D45A1F}.sday .lo{color:#2F6FB0}
@@ -916,6 +916,7 @@ const addD=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
 const RMIN=new Date(MONTHS[0].y,MONTHS[0].m,1),RMAX=new Date(MONTHS[MONTHS.length-1].y,MONTHS[MONTHS.length-1].m+1,0);
 const clampStart=d=>d<RMIN?RMIN:d>addD(RMAX,-6)?addD(RMAX,-6):d;
 const inRange=TODAY>=RMIN&&TODAY<=RMAX;
+let stripEnd=false;
 let start=clampStart(TODAY),selKey=inRange?iso(TODAY):null,WX={};
 const wxIcon=c=>c===0?"☀️":c<=2?"⛅":c===3?"☁️":c<=48?"🌫️":c<=57?"🌦️":c<=67?"🌧️":c<=77?"🌨️":c<=82?"🌧️":c<=86?"🌨️":"⛈️";
 const WX_SUN=`<g class="spin"><circle cx="32" cy="32" r="11" fill="#F6B428"/><g stroke="#F6B428" stroke-width="3.5" stroke-linecap="round"><path d="M32 9v6M32 49v6M9 32h6M49 32h6M15.7 15.7l4.3 4.3M44 44l4.3 4.3M15.7 48.3l4.3-4.3M44 20l4.3-4.3"/></g></g>`;
@@ -1007,7 +1008,7 @@ function render(){
   stripEl.innerHTML=keys.map((k,i)=>{const d=P(k),n=cnt[i],w=WX[k];
     const cls=["day","sday"];if(!w)cls.push("nofx");if(+d===+TODAY)cls.push("today");if(d<TODAY)cls.push("past");if(ITEMS.some(it=>it.days.includes(k)&&savedOn(it,k)))cls.push("saved");
     return `<button class="${cls.join(" ")}" data-k="${k}" aria-pressed="${selKey===k}" aria-label="${DOW[d.getDay()]} ${MN[d.getMonth()]} ${d.getDate()}: ${w?wxText(w)+", ":""}${n} event${n===1?"":"s"}${cls.includes("saved")?", includes something you hearted":""}"><span class="top"><span class="dw"><span class="dwl">${DOW[d.getDay()]}</span><span class="dws">${DOW[d.getDay()].slice(0,2)}</span></span><span class="dn">${d.getDate()}</span></span>${w?`${wxSvg(w.c)}<span class="temps"><span class="hi">▲${w.hi}°</span><span class="lo">▼${w.lo}°</span></span>${w.pp>=30?`<span class="rain">💧${w.pp}%</span>`:""}`:""}</button>`;}).join("");
-  const sk=iso(start)+"|"+selKey;if(stripEl.scrollWidth>stripEl.clientWidth+2&&stripEl.dataset.sk!==sk){stripEl.dataset.sk=sk;const t=stripEl.querySelector('[aria-pressed="true"]')||stripEl.querySelector(".today");stripEl.scrollLeft=t?Math.max(0,t.offsetLeft-stripEl.firstElementChild.offsetLeft-(t===stripEl.firstElementChild?0:20)):0;}
+  const sk=iso(start)+"|"+selKey;if(stripEl.scrollWidth>stripEl.clientWidth+2&&stripEl.dataset.sk!==sk){stripEl.dataset.sk=sk;if(stripEnd){stripEnd=false;stripEl.scrollLeft=stripEl.scrollWidth;}else{const t=stripEl.querySelector('[aria-pressed="true"]')||stripEl.querySelector(".today");stripEl.scrollLeft=t?Math.max(0,t.offsetLeft-stripEl.firstElementChild.offsetLeft-(t===stripEl.firstElementChild?0:20)):0;}}
   const st=document.getElementById("status");let list,ctx;
   const todayBtn=inRange&&!keys.includes(iso(TODAY))?` <button id="goToday">Back to today</button>`:"";
   if(selKey&&keys.includes(selKey)){list=inW.filter(it=>it.days.includes(selKey));ctx={day:selKey};
@@ -1063,8 +1064,9 @@ document.getElementById("prevW").onclick=()=>shiftWeek(-7);
 document.getElementById("nextW").onclick=()=>shiftWeek(7);
 const strip=document.getElementById("strip");let tx=null,ty=null;
 strip.addEventListener("click",e=>{const b=e.target.closest(".sday");if(!b)return;selKey=selKey===b.dataset.k?null:b.dataset.k;render();});
-strip.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
-strip.addEventListener("touchend",e=>{if(tx===null)return;if(strip.scrollWidth>strip.clientWidth+2){tx=ty=null;return;}const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=ty=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))shiftWeek(dx<0?7:-7);});
+let edgeL=false,edgeR=false;
+strip.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;edgeL=strip.scrollLeft<=2;edgeR=strip.scrollLeft+strip.clientWidth>=strip.scrollWidth-2;},{passive:true});
+strip.addEventListener("touchend",e=>{if(tx===null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=ty=null;if(strip.scrollWidth>strip.clientWidth+2){if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){if(dx<0&&edgeR)shiftWeek(7);else if(dx>0&&edgeL){stripEnd=true;shiftWeek(-7);}}return;}if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy))shiftWeek(dx<0?7:-7);});
 document.getElementById("calView").addEventListener("keydown",e=>{if(e.target.closest(".strip")){if(e.key==="ArrowLeft")shiftWeek(-7);if(e.key==="ArrowRight")shiftWeek(7);}});
 const dlg=document.getElementById("calDlg");
 function placePanel(){
