@@ -61,6 +61,8 @@ Eventbrite's search pages get swept for food festivals, festivals, fairs, market
 - A **real photo**: never Eventbrite's flyer image. The venue's or organizer's own photo comes first, then a Wikimedia Commons photo of the venue, park or neighborhood.
 - A **crowd estimate**, which sets the sort order.
 - A town the page recognizes, so the area filter works.
+- An **outdoors** flag if it's mainly outside, so rainy days can warn about it and move indoor events up.
+- A **Sells out** tag only for events that really do sell out or fill up, like timed-entry light shows, candlelight tours, owl prowls and headline comedians.
 - A **can't-miss** flag only if it truly is one. The Coming up row holds about 15–25 at a time.
 
 ## 4. Any day, Movies and Cheap movie Tuesday
